@@ -113,7 +113,7 @@ func DocToTree(doc string) (*node, error) {
 }
 
 // WriteTree - convert a tree of nodes into a printable string.
-//	'indent' is the starting indentation count for formating.
+//	'indent' is the starting indentation count; typically: WriteTree(0,n).
 func WriteTree(indent int,n *node) string {
 	var s string
 	if n.val != "" {
@@ -157,7 +157,8 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 			switch t.(type) {
 				case xml.StartElement:
 					tt := t.(xml.StartElement)
-					if n.key == "" {						// handle root
+					// handle root
+					if n.key == "" {
 						n.key = tt.Name.Local
 						if len(tt.Attr) > 0 {
 							for _,v := range tt.Attr {
@@ -213,7 +214,7 @@ func markDuplicateKeys(n *node) {
 }
 
 // treeToMap - convert a tree of nodes into a map[string]interface{}.
-//	(Parses to map the same as json.Unmarshal().)
+//	(Parses to map that is structurally the same as from json.Unmarshal().)
 // Note: root is not instantiated; call with: "m[n.key] = treeToMap()".
 func treeToMap(n *node,r bool) interface{} {
 	if len(n.nodes) == 0 {
@@ -264,6 +265,7 @@ func recast(s string,r bool) interface{} {
 }
 
 // WriteMap - dumps the map[string]interface{} for examination.
+//	'indent' is initial indentation count; typically: WriteMap(0,m).
 //	NOTE: with XML all element types are 'string'.
 //	But code written as generic for use with maps[string]interface{} values from json.Unmarshal().
 func WriteMap(indent int,m interface{}) string {
