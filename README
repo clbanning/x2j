@@ -1,0 +1,55 @@
+x2j.go - A utility library for Unmarshal'ing XML docs into a map or a JSON string.
+         clbanning@gmail.com
+
+MOTIVATION
+
+I make extensive use of JSON for messaging and typical unmarshal the messages into
+map[string]interface{} variables.  This is easily done using json.Unmarshal from the
+standard Go libraries.  Unfortunately, many legacy solutions use structured
+XML messages; in those environments the applications would have to be refitted to
+interoperate with my components.
+
+The better solution is to just provide an alternative HTTP handler that receives
+XML doc messages and parses it into a map[string]interface{} variable and then reuse
+all the JSON-based code.  The Go xml.Unmarshal() function does not provide the same
+option of unmarshaling XML messages into map[string]interface{} variables. So I wrote
+a couple of small functions to fill this gap.
+
+Of course, once the XML doc was unmarshal'd into a map[string]interface{} variable it
+was just a matter of calling json.Marshal() to provide it as a JSON string.  Hence 'x2j'
+rather than just 'x2m'.
+
+USAGE
+
+The package is fairly well self-documented.  The two really useful functions are:
+
+    - DocToMap(s string) (map[string]interface{}, error)
+    - DocToJson(s string) (string, error)
+
+They do just what they say. Other stuff is there if you want to examine intermediate
+results or print out the map in a more readable form than you get printing map values
+with 'fmt' library.
+
+A couple of parsing conventions:
+
+	- Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
+     to the attribute label.
+	- If the element is not a compound element and it has attributes, the element
+     is given the key '#text' for its map[string]interface{} representation.  (See
+     the 'atomFeedString.xml' test data, below.)
+
+IMPLEMENTATIOIN NOTES
+
+Nothing fancy here, just brute force.
+
+	- Use xml.Decoder to parse the XML doc and build a tree.
+	- Walk the tree and load values into a map[string]interface{} variable, 'm', as
+     appropriate.
+	- Use json.Marshaler to convert 'm' to JSON.
+
+As for testing:
+
+	- Copy an XML doc into 'x2j_test.xml'.
+	- Run "go test" and you'll get a full dump.
+     ("pathTestString.xml" and "atomFeedString.xml" are test data from "read_test.go"
+     in the encoding/xml directory of the standard package library.)
