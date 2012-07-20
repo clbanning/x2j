@@ -32,9 +32,9 @@ with 'fmt' library.
 
 A couple of parsing conventions:
 
-	- Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
+   - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
      to the attribute label.
-	- If the element is not a compound element and it has attributes, the element
+   - If the element is not a compound element and it has attributes, the element
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
@@ -42,14 +42,14 @@ IMPLEMENTATIOIN NOTES
 
 Nothing fancy here, just brute force.
 
-	- Use xml.Decoder to parse the XML doc and build a tree.
-	- Walk the tree and load values into a map[string]interface{} variable, 'm', as
+   - Use xml.Decoder to parse the XML doc and build a tree.
+   - Walk the tree and load values into a map[string]interface{} variable, 'm', as
      appropriate.
-	- Use json.Marshaler to convert 'm' to JSON.
+   - Use json.Marshaler to convert 'm' to JSON.
 
 As for testing:
 
-	- Copy an XML doc into 'x2j_test.xml'.
-	- Run "go test" and you'll get a full dump.
+   - Copy an XML doc into 'x2j_test.xml'.
+   - Run "go test" and you'll get a full dump.
      ("pathTestString.xml" and "atomFeedString.xml" are test data from "read_test.go"
      in the encoding/xml directory of the standard package library.)
