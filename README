@@ -3,7 +3,7 @@ x2j.go - A utility library for Unmarshal'ing XML docs into a map or a JSON strin
 
 MOTIVATION
 
-I make extensive use of JSON for messaging and typical unmarshal the messages into
+I make extensive use of JSON for messaging and typically unmarshal the messages into
 map[string]interface{} variables.  This is easily done using json.Unmarshal from the
 standard Go libraries.  Unfortunately, many legacy solutions use structured
 XML messages; in those environments the applications would have to be refitted to
