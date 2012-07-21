@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*	
-	Unmarshal an arbitrary XML document to a map or a JSON string. 
+	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string. 
 
 	DocToMap() returns an intermediate result with the XML doc unmarshal'd to a map
 	of type map[string]interface{}. It is analogous to unmarshal'ng a JSON string to
@@ -25,7 +25,6 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
-	"strings"
 )
 
 type node struct {
@@ -98,10 +97,8 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 func DocToTree(doc string) (*node, error) {
 	// xml.Decoder doesn't properly handle whitespace in some doc
 	// see songTextString.xml test case ... 
-	reg,_ := regexp.Compile("[ \t]*<")
+	reg,_ := regexp.Compile("[ \t\n\r]*<")
 	doc = reg.ReplaceAllString(doc,"<")
-	r := strings.NewReplacer("\n","","\r","","\t","")
-	doc = r.Replace(doc)
 
 	b := bytes.NewBufferString(doc)
 	p := xml.NewDecoder(b)
