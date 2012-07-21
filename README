@@ -53,3 +53,10 @@ As for testing:
    - Run "go test" and you'll get a full dump.
      ("pathTestString.xml" and "atomFeedString.xml" are test data from "read_test.go"
      in the encoding/xml directory of the standard package library.)
+
+USES
+
+   - putting a XML API on our message hub middleware (http://jsonhub.net)
+   - loading XML data into NoSQL database, such as, mongoDB
+
+

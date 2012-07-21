@@ -96,13 +96,15 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 
 // DocToTree - convert an XML doc into a tree of nodes.
 func DocToTree(doc string) (*node, error) {
+	// xml.Decoder doesn't properly handle whitespace in some doc
+	// see songTextString.xml test case ... 
 	reg,_ := regexp.Compile("[ \t]*<")
 	doc = reg.ReplaceAllString(doc,"<")
 	r := strings.NewReplacer("\n","","\r","","\t","")
 	doc = r.Replace(doc)
+
 	b := bytes.NewBufferString(doc)
 	p := xml.NewDecoder(b)
-
 	n, berr := xmlToTree("",nil,p)
 	if berr != nil {
 		return nil, berr
