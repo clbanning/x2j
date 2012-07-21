@@ -101,7 +101,6 @@ func DocToTree(doc string) (*node, error) {
 	r := strings.NewReplacer("\n","","\r","","\t","")
 	doc = r.Replace(doc)
 	b := bytes.NewBufferString(doc)
-	// p := xml.NewDecoder(b)     Go r1
 	p := xml.NewDecoder(b)
 
 	n, berr := xmlToTree("",nil,p)
