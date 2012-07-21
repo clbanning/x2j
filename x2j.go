@@ -152,45 +152,44 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 		t,err := p.Token()
 		if err != nil {
 			return nil, err
-		} else {
-			switch t.(type) {
-				case xml.StartElement:
-					tt := t.(xml.StartElement)
-					// handle root
-					if n.key == "" {
-						n.key = tt.Name.Local
-						if len(tt.Attr) > 0 {
-							for _,v := range tt.Attr {
-								na := new(node)
-								na.key = `-`+v.Name.Local
-								na.val = v.Value
-								n.nodes = append(n.nodes,na)
-							}
+		}
+		switch t.(type) {
+			case xml.StartElement:
+				tt := t.(xml.StartElement)
+				// handle root
+				if n.key == "" {
+					n.key = tt.Name.Local
+					if len(tt.Attr) > 0 {
+						for _,v := range tt.Attr {
+							na := new(node)
+							na.key = `-`+v.Name.Local
+							na.val = v.Value
+							n.nodes = append(n.nodes,na)
 						}
-					} else {
-						nn, nnerr := xmlToTree(tt.Name.Local,tt.Attr,p)
-						if nnerr != nil {
-							return nil, nnerr
-						}
-						n.nodes = append(n.nodes,nn)
 					}
-				case xml.EndElement:
-					// scan v.nodes for duplicate v.key values
-					markDuplicateKeys(n)
-					return n, nil
-				case xml.CharData:
-					tt := string(t.(xml.CharData))
-					if len(n.nodes) > 0 {
-						nn := new(node)
-						nn.key = "#text"
-						nn.val = tt
-						n.nodes = append(n.nodes,nn)
-					} else {
-						n.val = tt
+				} else {
+					nn, nnerr := xmlToTree(tt.Name.Local,tt.Attr,p)
+					if nnerr != nil {
+						return nil, nnerr
 					}
-				default:
-					// noop
-			}
+					n.nodes = append(n.nodes,nn)
+				}
+			case xml.EndElement:
+				// scan v.nodes for duplicate v.key values
+				markDuplicateKeys(n)
+				return n, nil
+			case xml.CharData:
+				tt := string(t.(xml.CharData))
+				if len(n.nodes) > 0 {
+					nn := new(node)
+					nn.key = "#text"
+					nn.val = tt
+					n.nodes = append(n.nodes,nn)
+				} else {
+					n.val = tt
+				}
+			default:
+				// noop
 		}
 	}
 	return nil, errors.New("EndElement not found for: "+n.key)
