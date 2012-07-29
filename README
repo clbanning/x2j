@@ -34,7 +34,7 @@ A couple of parsing conventions:
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
      to the attribute label.
-   - If the element is not a compound element and it has attributes, the element
+   - If the element is not a compound element and it has attributes, the element value
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
