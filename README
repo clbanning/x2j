@@ -38,7 +38,7 @@ A couple of parsing conventions:
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
-IMPLEMENTATIOIN NOTES
+IMPLEMENTATION NOTES
 
 Nothing fancy here, just brute force.
 
