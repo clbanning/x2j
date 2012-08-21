@@ -17,11 +17,11 @@
 			<line no="3">And we'll return it to its former glory</line>
 			<line no="4">But it just takes so long</line>
 		</verse>
-		<chorus>
-			<line>It's going to take a long time</line>
-			<line>It's going to take it, but we'll make it one day</line>
-			<line>It's going to take a long time</line>
-			<line>It's going to take it, but we'll make it one day</line>
-		</chorus>
 	</verses>
+	<chorus song="A Long Time" author="Mayer Hawthorne">
+		<line>It's going to take a long time</line>
+		<line>It's going to take it, but we'll make it one day</line>
+		<line>It's going to take a long time</line>
+		<line>It's going to take it, but we'll make it one day</line>
+	</chorus>
 </msg>
