@@ -265,7 +265,13 @@ func recast(s string,r bool) interface{} {
 //	'indent' is initial indentation count; typically: WriteMap(0,m).
 //	NOTE: with XML all element types are 'string'.
 //	But code written as generic for use with maps[string]interface{} values from json.Unmarshal().
-func WriteMap(indent int,m interface{}) string {
+//	Or it can handle a DocToMap(doc,true) result where values have been recast'd.
+func WriteMap(m interface{},i ...int) string {
+	var indent int
+	if len(i) == 1 {
+		indent = i[0]
+	}
+
 	var s string
 	switch m.(type) {
 		case nil:
@@ -293,7 +299,7 @@ func WriteMap(indent int,m interface{}) string {
 				for i := 0 ; i < indent ; i++ {
 					s += "  "
 				}
-				s += WriteMap(indent+1,v)
+				s += WriteMap(v,indent+1)
 			}
 		case map[string]interface{}:
 			for k,v := range m.(map[string]interface{}) {
@@ -301,7 +307,7 @@ func WriteMap(indent int,m interface{}) string {
 				for i := 0 ; i < indent ; i++ {
 					s += "  "
 				}
-				s += "[map[string]interface{}] "+k+" :"+WriteMap(indent+1,v)
+				s += "[map[string]interface{}] "+k+" :"+WriteMap(v,indent+1)
 		}
 		default:
 			// shouldn't ever be here ...

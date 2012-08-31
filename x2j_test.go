@@ -1,7 +1,6 @@
 package x2j
 
 import (
-	"encoding/json"
 	"os"
 	"testing"
 )
@@ -25,29 +24,23 @@ func TestX2j(t *testing.T) {
 		return
 	}
 	doc := string(buf)
-	println(doc)
+	println("\nXML DOC:\n",doc)
 
 	root, berr := DocToTree(doc)
 	if berr != nil {
 		println("berr:",berr.Error())
 		return
 	}
-	println(WriteTree(0,root))
+	println("\nTREE:\n",WriteTree(0,root))
 
 	m := make(map[string]interface{})
 	m[root.key] = treeToMap(root,false)
-	println(WriteMap(0,m))
-
-	j,jerr := json.MarshalIndent(m,"","  ")
-	if jerr != nil {
-		println("jerr:",jerr.Error())
-	}
-	println(string(j))
+	println("\nMAP:\n",WriteMap(m))
 
 	s,serr := DocToJsonIndent(doc,true)
 	if serr != nil {
 		println("serr:",serr.Error())
 	}
-	println(s)
+	println("\nDocToJsonIndent:\n",s)
 }
 
