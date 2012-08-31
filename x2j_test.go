@@ -41,6 +41,6 @@ func TestX2j(t *testing.T) {
 	if serr != nil {
 		println("serr:",serr.Error())
 	}
-	println("\nDocToJsonIndent:\n",s)
+	println("\nDocToJsonIndent(doc,true):\n",s)
 }
 
