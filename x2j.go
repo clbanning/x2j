@@ -174,7 +174,7 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 					n.nodes = append(n.nodes,nn)
 				}
 			case xml.EndElement:
-				// scan v.nodes for duplicate v.key values
+				// scan n.nodes for duplicate n.key values
 				markDuplicateKeys(n)
 				return n, nil
 			case xml.CharData:
