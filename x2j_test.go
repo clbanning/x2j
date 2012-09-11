@@ -33,7 +33,7 @@ func TestX2j(t *testing.T) {
 		fmt.Println("berr:",berr.Error())
 		return
 	}
-	fmt.Println("\nDocToTree():\n",WriteTree(root))
+	fmt.Println("\nDocToTree():\n",root.WriteTree())
 
 	m := make(map[string]interface{})
 	m[root.key] = root.treeToMap(false)

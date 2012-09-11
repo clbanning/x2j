@@ -110,9 +110,9 @@ func DocToTree(doc string) (*node, error) {
 	return n,nil
 }
 
-// WriteTree - convert a tree of nodes into a printable string.
-//	'padding' is the starting indentation; typically: WriteTree(n).
-func WriteTree(n *node,padding ...int) string {
+// (*node)WriteTree - convert a tree of nodes into a printable string.
+//	'padding' is the starting indentation; typically: n.WriteTree().
+func (n *node)WriteTree(padding ...int) string {
 	var indent int
 	if len(padding) == 1 {
 		indent = padding[0]
@@ -129,8 +129,8 @@ func WriteTree(n *node,padding ...int) string {
 			s += "  "
 		}
 		s += n.key+" :"+"\n"
-		for _,v := range n.nodes {
-			s += WriteTree(v,indent+1)
+		for _,nn := range n.nodes {
+			s += nn.WriteTree(indent+1)
 		}
 	}
 	return s
