@@ -88,7 +88,7 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 	}
 
 	m := make(map[string]interface{})
-	m[n.key] = treeToMap(n,r)
+	m[n.key] = n.treeToMap(r)
 
 	return m,nil
 }
@@ -111,8 +111,13 @@ func DocToTree(doc string) (*node, error) {
 }
 
 // WriteTree - convert a tree of nodes into a printable string.
-//	'indent' is the starting indentation count; typically: WriteTree(0,n).
-func WriteTree(indent int,n *node) string {
+//	'padding' is the starting indentation; typically: WriteTree(n).
+func WriteTree(n *node,padding ...int) string {
+	var indent int
+	if len(padding) == 1 {
+		indent = padding[0]
+	}
+
 	var s string
 	if n.val != "" {
 		for i := 0 ; i < indent ; i++ {
@@ -125,7 +130,7 @@ func WriteTree(indent int,n *node) string {
 		}
 		s += n.key+" :"+"\n"
 		for _,v := range n.nodes {
-			s += WriteTree(indent+1,v)
+			s += WriteTree(v,indent+1)
 		}
 	}
 	return s
@@ -175,7 +180,7 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 				}
 			case xml.EndElement:
 				// scan n.nodes for duplicate n.key values
-				markDuplicateKeys(n)
+				n.markDuplicateKeys()
 				return n, nil
 			case xml.CharData:
 				tt := string(t.(xml.CharData))
@@ -191,11 +196,12 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 				// noop
 		}
 	}
-	return nil, errors.New("EndElement not found for: "+n.key)
+	// Logically we can't get here, but provide an error message anyway.
+	return nil, errors.New("Unknown parse error in xmlToTree() for: "+n.key)
 }
 
-// markDuplicateKeys - set node.dup flag for loading map[string]interface{}.
-func markDuplicateKeys(n *node) {
+// (*node)markDuplicateKeys - set node.dup flag for loading map[string]interface{}.
+func (n *node)markDuplicateKeys() {
 	l := len(n.nodes)
 	for i := 0 ; i < l ; i++ {
 		if n.nodes[i].dup {
@@ -210,10 +216,10 @@ func markDuplicateKeys(n *node) {
 	}
 }
 
-// treeToMap - convert a tree of nodes into a map[string]interface{}.
+// (*node)treeToMap - convert a tree of nodes into a map[string]interface{}.
 //	(Parses to map that is structurally the same as from json.Unmarshal().)
 // Note: root is not instantiated; call with: "m[n.key] = treeToMap()".
-func treeToMap(n *node,r bool) interface{} {
+func (n *node)treeToMap(r bool) interface{} {
 	if len(n.nodes) == 0 {
 		return recast(n.val,r)
 	}
@@ -234,13 +240,13 @@ func treeToMap(n *node,r bool) interface{} {
 			} else {
 				a = make([]interface{},0)
 			}
-			a = append(a,treeToMap(v,r))
+			a = append(a,v.treeToMap(r))
 			m[v.key] = interface{}(a)
 			continue
 		}
 
 		// it's a unique key
-		m[v.key] = treeToMap(v,r)
+		m[v.key] = v.treeToMap(r)
 	}
 
 	return interface{}(m)
@@ -262,14 +268,14 @@ func recast(s string,r bool) interface{} {
 }
 
 // WriteMap - dumps the map[string]interface{} for examination.
-//	'indent' is initial indentation count; typically: WriteMap(0,m).
+//	'offset' is initial indentation count; typically: WriteMap(m).
 //	NOTE: with XML all element types are 'string'.
 //	But code written as generic for use with maps[string]interface{} values from json.Unmarshal().
-//	Or it can handle a DocToMap(doc,true) result where values have been recast'd.
-func WriteMap(m interface{},i ...int) string {
+// Or it can handle a DocToMap(doc,true) result where values have be recast'd.
+func WriteMap(m interface{}, offset ...int) string {
 	var indent int
-	if len(i) == 1 {
-		indent = i[0]
+	if len(offset) == 1 {
+		indent = offset[0]
 	}
 
 	var s string
@@ -289,7 +295,7 @@ func WriteMap(m interface{},i ...int) string {
 				for i := 0 ; i < indent ; i++ {
 					s += "  "
 				}
-				s += "item: "+strconv.FormatInt(int64(i),10)
+				s += "[item: "+strconv.FormatInt(int64(i),10)+"]"
 				switch v.(type) {
 					case string,float64,bool:
 						s += "\n"
@@ -307,7 +313,8 @@ func WriteMap(m interface{},i ...int) string {
 				for i := 0 ; i < indent ; i++ {
 					s += "  "
 				}
-				s += "[map[string]interface{}] "+k+" :"+WriteMap(v,indent+1)
+				// s += "[map[string]interface{}] "+k+" :"+WriteMap(v,indent+1)
+				s += k+" :"+WriteMap(v,indent+1)
 		}
 		default:
 			// shouldn't ever be here ...
