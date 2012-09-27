@@ -27,11 +27,11 @@ import (
 	"strconv"
 )
 
-type node struct {
+type Node struct {
 	dup bool
 	key string
 	val string
-	nodes []*node
+	nodes []*Node
 }
 
 // DocToJson - return an XML doc as a JSON string.
@@ -94,7 +94,7 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 }
 
 // DocToTree - convert an XML doc into a tree of nodes.
-func DocToTree(doc string) (*node, error) {
+func DocToTree(doc string) (*Node, error) {
 	// xml.Decoder doesn't properly handle whitespace in some doc
 	// see songTextString.xml test case ... 
 	reg,_ := regexp.Compile("[ \t\n\r]*<")
@@ -110,9 +110,9 @@ func DocToTree(doc string) (*node, error) {
 	return n,nil
 }
 
-// (*node)WriteTree - convert a tree of nodes into a printable string.
+// (*Node)WriteTree - convert a tree of nodes into a printable string.
 //	'padding' is the starting indentation; typically: n.WriteTree().
-func (n *node)WriteTree(padding ...int) string {
+func (n *Node)WriteTree(padding ...int) string {
 	var indent int
 	if len(padding) == 1 {
 		indent = padding[0]
@@ -136,16 +136,16 @@ func (n *node)WriteTree(padding ...int) string {
 	return s
 }
 
-// xmlToTree - load a 'clean' XML doc into a tree of *node.
-func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
-	n := new(node)
-	n.nodes = make([]*node,0)
+// xmlToTree - load a 'clean' XML doc into a tree of *Node.
+func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*Node, error) {
+	n := new(Node)
+	n.nodes = make([]*Node,0)
 
 	if skey != "" {
 		n.key = skey
 		if len(a) > 0 {
 			for _,v := range a {
-				na := new(node)
+				na := new(Node)
 				na.key = `-`+v.Name.Local
 				na.val = v.Value
 				n.nodes = append(n.nodes,na)
@@ -165,7 +165,7 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 					n.key = tt.Name.Local
 					if len(tt.Attr) > 0 {
 						for _,v := range tt.Attr {
-							na := new(node)
+							na := new(Node)
 							na.key = `-`+v.Name.Local
 							na.val = v.Value
 							n.nodes = append(n.nodes,na)
@@ -185,7 +185,7 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 			case xml.CharData:
 				tt := string(t.(xml.CharData))
 				if len(n.nodes) > 0 {
-					nn := new(node)
+					nn := new(Node)
 					nn.key = "#text"
 					nn.val = tt
 					n.nodes = append(n.nodes,nn)
@@ -200,8 +200,8 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*node, error) {
 	return nil, errors.New("Unknown parse error in xmlToTree() for: "+n.key)
 }
 
-// (*node)markDuplicateKeys - set node.dup flag for loading map[string]interface{}.
-func (n *node)markDuplicateKeys() {
+// (*Node)markDuplicateKeys - set node.dup flag for loading map[string]interface{}.
+func (n *Node)markDuplicateKeys() {
 	l := len(n.nodes)
 	for i := 0 ; i < l ; i++ {
 		if n.nodes[i].dup {
@@ -216,10 +216,10 @@ func (n *node)markDuplicateKeys() {
 	}
 }
 
-// (*node)treeToMap - convert a tree of nodes into a map[string]interface{}.
+// (*Node)treeToMap - convert a tree of nodes into a map[string]interface{}.
 //	(Parses to map that is structurally the same as from json.Unmarshal().)
 // Note: root is not instantiated; call with: "m[n.key] = treeToMap()".
-func (n *node)treeToMap(r bool) interface{} {
+func (n *Node)treeToMap(r bool) interface{} {
 	if len(n.nodes) == 0 {
 		return recast(n.val,r)
 	}
