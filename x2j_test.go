@@ -60,5 +60,34 @@ func TestX2j(t *testing.T) {
 	}
 	fmt.Println("\nDocToJsonIndent, recast==true:\n",s)
 
+	// test ValueInMap()
+	doc = `<entry><vars><foo>bar</foo><foo2><hello>world</hello></foo2></vars></entry>`
+	fmt.Println("\nRead doc:",doc)
+	fmt.Println("Looking for value: entry.vars")
+	mm,mmerr = DocToMap(doc)
+	if mmerr != nil {
+		fmt.Println("merr:",mmerr.Error())
+	}
+	v,verr := ValueInMap(mm,"entry.vars")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+	fmt.Println("Looking for value: entry.vars.foo2.hello")
+	v,verr = ValueInMap(mm,"entry.vars.foo2.hello")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		fmt.Println(v.(string))
+	}
+	fmt.Println("Looking with error in path: entry.var")
+	v,verr = ValueInMap(mm,"entry.var")
+	fmt.Println("verr:",verr.Error())
 }
 

@@ -24,6 +24,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"strconv"
 )
 
@@ -321,4 +322,33 @@ func WriteMap(m interface{}, offset ...int) string {
 			s += fmt.Sprintf("unknown type for: %v",m)
 	}
 	return s
+}
+
+// ValueInMap - retrieves value based on walking the map, 'm'.
+//	'path' is a period-separated hierarchy of keys in the map.
+//	If the path can't be traversed, an error is returned.
+func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
+	keys := strings.Split(path,".")
+
+	// initialize return value to 'm' so a path of "" will work correctly
+	var v interface{} = m
+	var ok bool
+	var isMap bool = true
+	for _,key := range keys {
+		if !isMap {
+			return nil, errors.New("value type is not map[string]interface{}")
+		}
+		if v,ok = m[key]; !ok {
+			return nil, errors.New("no key in map: "+key)
+		} else {
+			switch v.(type) {
+				case map[string]interface{}:
+					m = v.(map[string]interface{})
+					isMap = true
+				default:
+					isMap = false
+			}
+		}
+	}
+	return v, nil
 }
