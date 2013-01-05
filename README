@@ -35,7 +35,7 @@ To retrieve a value for specific tag use:
     - DocToValue(s,path string) (interface{}, error)
 
 The 'path' argument is a period-separated tag hierarchy (similar to 'relative variable'
-syntax in Websphere Broker ESQL programming).  It is the program's responsibility to
+syntax in Websphere MQ Broker ESQL programming).  It is the program's responsibility to
 cast the returned value to the proper type; possible types are the normal JSON 
 unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
 
