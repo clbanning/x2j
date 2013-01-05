@@ -89,5 +89,14 @@ func TestX2j(t *testing.T) {
 	fmt.Println("Looking with error in path: entry.var")
 	v,verr = ValueInMap(mm,"entry.var")
 	fmt.Println("verr:",verr.Error())
+
+	// test DocToValue()
+	fmt.Println("DocToValue() for tag path entry.vars")
+	v,verr = DocToValue(doc,"entry.vars")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	}
+	j,_ = json.MarshalIndent(v,"","  ")
+	fmt.Println(string(j))
 }
 

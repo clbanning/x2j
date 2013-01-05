@@ -336,7 +336,7 @@ func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
 	var isMap bool = true
 	for _,key := range keys {
 		if !isMap {
-			return nil, errors.New("value type is not map[string]interface{}")
+			return nil, errors.New("value type is not map[string]interface{}. Looking for: "+key)
 		}
 		if v,ok = m[key]; !ok {
 			return nil, errors.New("no key in map: "+key)
@@ -352,3 +352,27 @@ func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
 	}
 	return v, nil
 }
+
+// DocToValue - return a value for a specific tag
+//	'path' is a hierarchy of XML tags, e.g., "doc.name"
+//	The optional argument 'recast' will try and coerce the string values to float64 or bool.
+func DocToValue(doc, path string,recast ...bool) (interface{},error) {
+	var r bool
+	if len(recast) == 1 {
+		r = recast[0]
+	}
+	n,err := DocToTree(doc)
+	if err != nil {
+		return nil,err
+	}
+
+	m := make(map[string]interface{})
+	m[n.key] = n.treeToMap(r)
+
+	v,verr := ValueInMap(m,path)
+	if verr != nil {
+		return nil, verr
+	}
+	return v,nil
+}
+

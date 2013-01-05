@@ -30,6 +30,15 @@ They do just what they say. Other stuff is there if you want to examine intermed
 results or print out the map in a more readable form than you get printing map values
 with 'fmt' library.
 
+To retrieve a value for specific tag use: 
+
+    - DocToValue(s,path string) (interface{}, error)
+
+The 'path' argument is a period-separated tag hierarchy (similar to 'relative variable'
+syntax in Websphere Broker ESQL programming).  It is the program's responsibilit to
+cast the returned value to the proper type; possible types are the normal JSON 
+unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
+
 A couple of parsing conventions:
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
