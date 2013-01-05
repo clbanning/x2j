@@ -94,6 +94,30 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 	return m,nil
 }
 
+// DocToValue - return a value for a specific tag
+//	'doc' is a valid XML message.
+//	'path' is a hierarchy of XML tags, e.g., "doc.name".
+//	The optional argument 'recast' will try and coerce the string values to float64 or bool.
+func DocToValue(doc, path string,recast ...bool) (interface{},error) {
+	var r bool
+	if len(recast) == 1 {
+		r = recast[0]
+	}
+	n,err := DocToTree(doc)
+	if err != nil {
+		return nil,err
+	}
+
+	m := make(map[string]interface{})
+	m[n.key] = n.treeToMap(r)
+
+	v,verr := ValueInMap(m,path)
+	if verr != nil {
+		return nil, verr
+	}
+	return v,nil
+}
+
 // DocToTree - convert an XML doc into a tree of nodes.
 func DocToTree(doc string) (*Node, error) {
 	// xml.Decoder doesn't properly handle whitespace in some doc
@@ -325,6 +349,7 @@ func WriteMap(m interface{}, offset ...int) string {
 }
 
 // ValueInMap - retrieves value based on walking the map, 'm'.
+//	'm' is the map value of interest.
 //	'path' is a period-separated hierarchy of keys in the map.
 //	If the path can't be traversed, an error is returned.
 func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
@@ -351,28 +376,5 @@ func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
 		}
 	}
 	return v, nil
-}
-
-// DocToValue - return a value for a specific tag
-//	'path' is a hierarchy of XML tags, e.g., "doc.name"
-//	The optional argument 'recast' will try and coerce the string values to float64 or bool.
-func DocToValue(doc, path string,recast ...bool) (interface{},error) {
-	var r bool
-	if len(recast) == 1 {
-		r = recast[0]
-	}
-	n,err := DocToTree(doc)
-	if err != nil {
-		return nil,err
-	}
-
-	m := make(map[string]interface{})
-	m[n.key] = n.treeToMap(r)
-
-	v,verr := ValueInMap(m,path)
-	if verr != nil {
-		return nil, verr
-	}
-	return v,nil
 }
 
