@@ -94,11 +94,11 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 	return m,nil
 }
 
-// DocToValue - return a value for a specific tag
+// DocValue - return a value for a specific tag
 //	'doc' is a valid XML message.
 //	'path' is a hierarchy of XML tags, e.g., "doc.name".
 //	The optional argument 'recast' will try and coerce the string values to float64 or bool.
-func DocToValue(doc, path string,recast ...bool) (interface{},error) {
+func DocValue(doc, path string,recast ...bool) (interface{},error) {
 	var r bool
 	if len(recast) == 1 {
 		r = recast[0]
@@ -111,11 +111,11 @@ func DocToValue(doc, path string,recast ...bool) (interface{},error) {
 	m := make(map[string]interface{})
 	m[n.key] = n.treeToMap(r)
 
-	v,verr := ValueInMap(m,path)
+	v,verr := MapValue(m,path)
 	if verr != nil {
 		return nil, verr
 	}
-	return v,nil
+	return v, nil
 }
 
 // DocToTree - convert an XML doc into a tree of nodes.
@@ -348,11 +348,11 @@ func WriteMap(m interface{}, offset ...int) string {
 	return s
 }
 
-// ValueInMap - retrieves value based on walking the map, 'm'.
+// MapValue - retrieves value based on walking the map, 'm'.
 //	'm' is the map value of interest.
 //	'path' is a period-separated hierarchy of keys in the map.
 //	If the path can't be traversed, an error is returned.
-func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
+func MapValue(m map[string]interface{},path string) (interface{}, error) {
 	keys := strings.Split(path,".")
 
 	// initialize return value to 'm' so a path of "" will work correctly
@@ -374,6 +374,23 @@ func ValueInMap(m map[string]interface{},path string) (interface{}, error) {
 					isMap = false
 			}
 		}
+	}
+	return v, nil
+}
+
+// JsonValue - return a value for a specific key
+//	'j' is a valid JSON string 
+//	'path' is a hierarchy of keys, e.g., "lines.one".
+// NOTE: this really belongs somewhere else - probably rwjson package
+func JsonValue(j, path string) (interface{},error) {
+	m := make(map[string]interface{})
+	if jerr := json.Unmarshal([]byte(j),&m); jerr != nil {
+		return nil, jerr
+	}
+
+	v,verr := MapValue(m,path)
+	if verr != nil {
+		return nil, verr
 	}
 	return v, nil
 }

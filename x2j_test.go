@@ -60,7 +60,7 @@ func TestX2j(t *testing.T) {
 	}
 	fmt.Println("\nDocToJsonIndent, recast==true:\n",s)
 
-	// test ValueInMap()
+	// test MapValue()
 	doc = `<entry><vars><foo>bar</foo><foo2><hello>world</hello></foo2></vars></entry>`
 	fmt.Println("\nRead doc:",doc)
 	fmt.Println("Looking for value: entry.vars")
@@ -68,7 +68,7 @@ func TestX2j(t *testing.T) {
 	if mmerr != nil {
 		fmt.Println("merr:",mmerr.Error())
 	}
-	v,verr := ValueInMap(mm,"entry.vars")
+	v,verr := MapValue(mm,"entry.vars")
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	} else {
@@ -80,23 +80,32 @@ func TestX2j(t *testing.T) {
 		}
 	}
 	fmt.Println("Looking for value: entry.vars.foo2.hello")
-	v,verr = ValueInMap(mm,"entry.vars.foo2.hello")
+	v,verr = MapValue(mm,"entry.vars.foo2.hello")
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	} else {
 		fmt.Println(v.(string))
 	}
 	fmt.Println("Looking with error in path: entry.var")
-	v,verr = ValueInMap(mm,"entry.var")
+	v,verr = MapValue(mm,"entry.var")
 	fmt.Println("verr:",verr.Error())
 
-	// test DocToValue()
-	fmt.Println("DocToValue() for tag path entry.vars")
-	v,verr = DocToValue(doc,"entry.vars")
+	// test DocValue()
+	fmt.Println("DocValue() for tag path entry.vars")
+	v,verr = DocValue(doc,"entry.vars")
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	}
 	j,_ = json.MarshalIndent(v,"","  ")
 	fmt.Println(string(j))
+
+	// test JsonValue()
+	fmt.Println("\nJsonValue()")
+	var js string = `{ "name":"CB", "address":{ "street":"my string", "city":"Somewhere", "country":"Islandia"}}`
+	v, verr = JsonValue(js,"address.country")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	}
+	fmt.Println(v.(string))
 }
 
