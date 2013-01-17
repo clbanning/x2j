@@ -23,8 +23,8 @@ USAGE
 
 The package is fairly well self-documented.  The two really useful functions are:
 
-    - DocToMap(s string) (map[string]interface{}, error)
-    - DocToJson(s string) (string, error)
+    - DocToMap(s string, recast ...bool) (map[string]interface{}, error)
+    - DocToJson(s string, recast ...bool) (string, error)
 
 They do just what they say. Other stuff is there if you want to examine intermediate
 results or print out the map in a more readable form than you get printing map values
