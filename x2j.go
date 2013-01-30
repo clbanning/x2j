@@ -1,4 +1,4 @@
-// Copyright 2012 Charles Banning. All rights reserved.
+// Copyright 2012-2013 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*	
@@ -29,14 +29,16 @@ import (
 )
 
 type Node struct {
-	dup bool
-	key string
-	val string
+	dup bool			// is member of a list
+	attr bool		// is an attribute
+	key string		// XML tag
+	val string		// element value
 	nodes []*Node
 }
 
 // DocToJson - return an XML doc as a JSON string.
 //	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
+//	Note: recasting is only applied to element values, not attribute values.
 func DocToJson(doc string,recast ...bool) (string,error) {
 	var r bool
 	if len(recast) == 1 {
@@ -52,11 +54,13 @@ func DocToJson(doc string,recast ...bool) (string,error) {
 		return "",berr
 	}
 
+	// NOTE: don't have to worry about safe JSON marshaling with json.Marshal, since '<' and '>" are reservedin XML.
 	return string(b),nil
 }
 
 // DocToJsonIndent - return an XML doc as a prettified JSON string.
 //	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
+//	Note: recasting is only applied to element values, not attribute values.
 func DocToJsonIndent(doc string,recast ...bool) (string,error) {
 	var r bool
 	if len(recast) == 1 {
@@ -72,12 +76,14 @@ func DocToJsonIndent(doc string,recast ...bool) (string,error) {
 		return "",berr
 	}
 
+	// NOTE: don't have to worry about safe JSON marshaling with json.Marshal, since '<' and '>" are reservedin XML.
 	return string(b),nil
 }
 
 // DocToMap - convert an XML doc into a map[string]interface{}.
 // (This is analogous to unmarshalling a JSON string to map[string]interface{} using json.Unmarshal().)
 //	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
+//	Note: recasting is only applied to element values, not attribute values.
 func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 	var r bool
 	if len(recast) == 1 {
@@ -98,6 +104,7 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 //	'doc' is a valid XML message.
 //	'path' is a hierarchy of XML tags, e.g., "doc.name".
 //	The optional argument 'recast' will try and coerce the string values to float64 or bool.
+//	Note: recasting is only applied to element values, not attribute values.
 func DocValue(doc, path string,recast ...bool) (interface{},error) {
 	var r bool
 	if len(recast) == 1 {
@@ -171,6 +178,7 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*Node, error) {
 		if len(a) > 0 {
 			for _,v := range a {
 				na := new(Node)
+				na.attr = true
 				na.key = `-`+v.Name.Local
 				na.val = v.Value
 				n.nodes = append(n.nodes,na)
@@ -191,6 +199,7 @@ func xmlToTree(skey string,a []xml.Attr,p *xml.Decoder) (*Node, error) {
 					if len(tt.Attr) > 0 {
 						for _,v := range tt.Attr {
 							na := new(Node)
+							na.attr = true
 							na.key = `-`+v.Name.Local
 							na.val = v.Value
 							n.nodes = append(n.nodes,na)
@@ -244,8 +253,10 @@ func (n *Node)markDuplicateKeys() {
 // (*Node)treeToMap - convert a tree of nodes into a map[string]interface{}.
 //	(Parses to map that is structurally the same as from json.Unmarshal().)
 // Note: root is not instantiated; call with: "m[n.key] = treeToMap()".
+//	1/29/13 - attributes are not recast, only element values
 func (n *Node)treeToMap(r bool) interface{} {
 	if len(n.nodes) == 0 {
+		if n.attr { return interface{}(n.val) }
 		return recast(n.val,r)
 	}
 
@@ -253,7 +264,11 @@ func (n *Node)treeToMap(r bool) interface{} {
 	for _,v := range n.nodes {
 		// just a value
 		if !v.dup && len(v.nodes) == 0 {
-			m[v.key] = recast(v.val,r)
+			if v.attr {
+				m[v.key] = interface{}(v.val)
+			} else {
+				m[v.key] = recast(v.val,r)
+			}
 			continue
 		}
 
@@ -352,6 +367,7 @@ func WriteMap(m interface{}, offset ...int) string {
 //	'm' is the map value of interest.
 //	'path' is a period-separated hierarchy of keys in the map.
 //	If the path can't be traversed, an error is returned.
+//	NOTE: duplicated in rwjson package.
 func MapValue(m map[string]interface{},path string) (interface{}, error) {
 	keys := strings.Split(path,".")
 
@@ -378,10 +394,12 @@ func MapValue(m map[string]interface{},path string) (interface{}, error) {
 	return v, nil
 }
 
+// genAttr() - generate map of attributes=value entries as map["-"+string]string
+
 // JsonValue - return a value for a specific key
 //	'j' is a valid JSON string 
 //	'path' is a hierarchy of keys, e.g., "lines.one".
-// NOTE: this really belongs somewhere else - probably rwjson package
+//	NOTE: duplicated in rwjson package.
 func JsonValue(j, path string) (interface{},error) {
 	m := make(map[string]interface{})
 	if jerr := json.Unmarshal([]byte(j),&m); jerr != nil {
