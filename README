@@ -32,7 +32,7 @@ with 'fmt' library.
 
 To retrieve a value for specific tag use: 
 
-    - DocValue(s,path string, recast ...bool) (interface{}, error)
+    - DocValue(s, path string, attributes ...string) (interface{}, error)
 
 The 'path' argument is a period-separated tag hierarchy (similar to 'relative variable'
 syntax in Websphere MQ Broker ESQL programming).  It is the program's responsibility to

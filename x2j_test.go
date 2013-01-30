@@ -59,16 +59,18 @@ func TestX2j(t *testing.T) {
 		fmt.Println("serr:",serr.Error())
 	}
 	fmt.Println("\nDocToJsonIndent, recast==true:\n",s)
+}
 
+func TestGetValue(t *testing.T) {
 	// test MapValue()
-	doc = `<entry><vars><foo>bar</foo><foo2><hello>world</hello></foo2></vars></entry>`
+	doc := `<entry><vars><foo>bar</foo><foo2><hello>world</hello></foo2></vars></entry>`
 	fmt.Println("\nRead doc:",doc)
 	fmt.Println("Looking for value: entry.vars")
-	mm,mmerr = DocToMap(doc)
+	mm,mmerr := DocToMap(doc)
 	if mmerr != nil {
 		fmt.Println("merr:",mmerr.Error())
 	}
-	v,verr := MapValue(mm,"entry.vars")
+	v,verr := MapValue(mm,"entry.vars",nil)
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	} else {
@@ -80,14 +82,14 @@ func TestX2j(t *testing.T) {
 		}
 	}
 	fmt.Println("Looking for value: entry.vars.foo2.hello")
-	v,verr = MapValue(mm,"entry.vars.foo2.hello")
+	v,verr = MapValue(mm,"entry.vars.foo2.hello",nil)
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	} else {
 		fmt.Println(v.(string))
 	}
 	fmt.Println("Looking with error in path: entry.var")
-	v,verr = MapValue(mm,"entry.var")
+	v,verr = MapValue(mm,"entry.var",nil)
 	fmt.Println("verr:",verr.Error())
 
 	// test DocValue()
@@ -96,16 +98,100 @@ func TestX2j(t *testing.T) {
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	}
-	j,_ = json.MarshalIndent(v,"","  ")
+	j,_ := json.MarshalIndent(v,"","  ")
 	fmt.Println(string(j))
-
-	// test JsonValue()
-	fmt.Println("\nJsonValue()")
-	var js string = `{ "name":"CB", "address":{ "street":"my string", "city":"Somewhere", "country":"Islandia"}}`
-	v, verr = JsonValue(js,"address.country")
-	if verr != nil {
-		fmt.Println("verr:",verr.Error())
-	}
-	fmt.Println(v.(string))
 }
 
+
+func TestGetValueWithAttr(t *testing.T) {
+	doc := `<entry><vars>
+		<foo item="1">bar</foo>
+		<foo item="2">
+			<hello item="3">world</hello>
+			<hello item="4">universe</hello>
+		</foo></vars></entry>`
+	fmt.Println("\nRead doc:",doc)
+	fmt.Println("Looking for value: entry.vars")
+	mm,mmerr := DocToMap(doc)
+	if mmerr != nil {
+		fmt.Println("merr:",mmerr.Error())
+	}
+	v,verr := MapValue(mm,"entry.vars",nil)
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
+	fmt.Println("\nMapValue(): Looking for value: entry.vars.foo item=2")
+	a,aerr := NewAttributeMap("item:2")
+	if aerr != nil {
+		fmt.Println("aerr:",aerr.Error())
+	}
+	v,verr = MapValue(mm,"entry.vars.foo",a)
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
+	fmt.Println("\nMapValue(): Looking for hello item:4")
+	a,_ = NewAttributeMap("item:4")
+	v,verr = MapValue(v.(map[string]interface{}),"hello",a)
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
+	fmt.Println("\nDocValue(): Looking for entry.vars.foo.hello item:4")
+	v,verr = DocValue(doc,"entry.vars.foo.hello","item:4")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
+	// test 'recast' switch
+	fmt.Println("\ntesting recast switch...")
+	mm,mmerr = DocToMap(doc,true)
+	if mmerr != nil {
+		fmt.Println("merr:",mmerr.Error())
+	}
+	fmt.Println("MapValue(): Looking for value: entry.vars.foo item=2")
+	a,aerr = NewAttributeMap("item:2")
+	if aerr != nil {
+		fmt.Println("aerr:",aerr.Error())
+	}
+	v,verr = MapValue(mm,"entry.vars.foo",a,true)
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+}

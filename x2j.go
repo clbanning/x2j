@@ -38,7 +38,6 @@ type Node struct {
 
 // DocToJson - return an XML doc as a JSON string.
 //	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
-//	Note: recasting is only applied to element values, not attribute values.
 func DocToJson(doc string,recast ...bool) (string,error) {
 	var r bool
 	if len(recast) == 1 {
@@ -98,31 +97,6 @@ func DocToMap(doc string,recast ...bool) (map[string]interface{},error) {
 	m[n.key] = n.treeToMap(r)
 
 	return m,nil
-}
-
-// DocValue - return a value for a specific tag
-//	'doc' is a valid XML message.
-//	'path' is a hierarchy of XML tags, e.g., "doc.name".
-//	The optional argument 'recast' will try and coerce the string values to float64 or bool.
-//	Note: recasting is only applied to element values, not attribute values.
-func DocValue(doc, path string,recast ...bool) (interface{},error) {
-	var r bool
-	if len(recast) == 1 {
-		r = recast[0]
-	}
-	n,err := DocToTree(doc)
-	if err != nil {
-		return nil,err
-	}
-
-	m := make(map[string]interface{})
-	m[n.key] = n.treeToMap(r)
-
-	v,verr := MapValue(m,path)
-	if verr != nil {
-		return nil, verr
-	}
-	return v, nil
 }
 
 // DocToTree - convert an XML doc into a tree of nodes.
@@ -253,10 +227,8 @@ func (n *Node)markDuplicateKeys() {
 // (*Node)treeToMap - convert a tree of nodes into a map[string]interface{}.
 //	(Parses to map that is structurally the same as from json.Unmarshal().)
 // Note: root is not instantiated; call with: "m[n.key] = treeToMap()".
-//	1/29/13 - attributes are not recast, only element values
 func (n *Node)treeToMap(r bool) interface{} {
 	if len(n.nodes) == 0 {
-		if n.attr { return interface{}(n.val) }
 		return recast(n.val,r)
 	}
 
@@ -264,11 +236,7 @@ func (n *Node)treeToMap(r bool) interface{} {
 	for _,v := range n.nodes {
 		// just a value
 		if !v.dup && len(v.nodes) == 0 {
-			if v.attr {
-				m[v.key] = interface{}(v.val)
-			} else {
-				m[v.key] = recast(v.val,r)
-			}
+			m[v.key] = recast(v.val,r)
 			continue
 		}
 
@@ -363,21 +331,58 @@ func WriteMap(m interface{}, offset ...int) string {
 	return s
 }
 
+// ------------------------  value extraction from XML doc --------------------------
+
+// DocValue - return a value for a specific tag
+//	'doc' is a valid XML message.
+//	'path' is a hierarchy of XML tags, e.g., "doc.name".
+// 'attrs' is an optional list of "name:value" pairs for attributes.
+//	Note: 'recast' is not enabled here. Use DocToMap(), NewAttributeMap(), and MapValue() calls for that.
+func DocValue(doc, path string, attrs ...string) (interface{},error) {
+	n,err := DocToTree(doc)
+	if err != nil {
+		return nil,err
+	}
+
+	m := make(map[string]interface{})
+	m[n.key] = n.treeToMap(false)
+
+	a, aerr := NewAttributeMap(attrs...)
+	if aerr != nil {
+		return nil, aerr
+	}
+	v,verr := MapValue(m,path,a)
+	if verr != nil {
+		return nil, verr
+	}
+	return v, nil
+}
+
 // MapValue - retrieves value based on walking the map, 'm'.
 //	'm' is the map value of interest.
 //	'path' is a period-separated hierarchy of keys in the map.
+// 'attr' is a map of attribute "name:value" pairs from NewAttributeMap().
 //	If the path can't be traversed, an error is returned.
-//	NOTE: duplicated in rwjson package.
-func MapValue(m map[string]interface{},path string) (interface{}, error) {
+//	Note: the optional argument 'r' can be used to coerce attribute values, 'attr', if done so for 'm'.
+func MapValue(m map[string]interface{},path string, attr map[string]interface{}, r ...bool) (interface{}, error) {
+	// attribute values may have been recasted during map construction; default is 'false'.
+	if len(r) == 1 && r[0] == true {
+		for k,v := range attr {
+			attr[k] = recast(v.(string),true)
+		}
+	}
+
+	// parse the path
 	keys := strings.Split(path,".")
 
 	// initialize return value to 'm' so a path of "" will work correctly
 	var v interface{} = m
 	var ok bool
 	var isMap bool = true
+	var okey string
 	for _,key := range keys {
 		if !isMap {
-			return nil, errors.New("value type is not map[string]interface{}. Looking for: "+key)
+			return nil, errors.New("no keys beyond: "+okey)
 		}
 		if v,ok = m[key]; !ok {
 			return nil, errors.New("no key in map: "+key)
@@ -390,26 +395,63 @@ func MapValue(m map[string]interface{},path string) (interface{}, error) {
 					isMap = false
 			}
 		}
+		// save 'key' for error reporting
+		okey = key
 	}
-	return v, nil
+
+	// no attributes to match, then done
+	if len(attr) ==  0 {
+		return v, nil
+	}
+
+	// match attributes; value is "#text" or nil
+	return hasAttributes(v,attr)
 }
 
-// genAttr() - generate map of attributes=value entries as map["-"+string]string
-
-// JsonValue - return a value for a specific key
-//	'j' is a valid JSON string 
-//	'path' is a hierarchy of keys, e.g., "lines.one".
-//	NOTE: duplicated in rwjson package.
-func JsonValue(j, path string) (interface{},error) {
-	m := make(map[string]interface{})
-	if jerr := json.Unmarshal([]byte(j),&m); jerr != nil {
-		return nil, jerr
+// hasAttributes() - interface{} equality works for string, float64, bool
+func hasAttributes(v interface{},a map[string]interface{}) (interface{}, error) {
+	switch v.(type) {
+		case []interface{}:
+			// run through all entries looking one with matching attributes
+			for _,vv := range v.([]interface{}) {
+				if vvv,vvverr := hasAttributes(vv,a); vvverr == nil {
+					return vvv, nil
+				}
+			}
+			return nil, errors.New("no list member with matching attributes")
+		case map[string]interface{}:
+			// do all attribute name:value pairs match?
+			nv := v.(map[string]interface{})
+			for key,val := range a {
+				if vv,ok := nv[key]; !ok {
+					return nil, errors.New("no attribute with name: "+key[1:])
+				} else if val != vv {
+					return nil, errors.New("no attribute key:value pair: "+fmt.Sprintf("%s:%v",key[1:],val))
+				}
+			}
+			// they all match; so return value associated with "#text" key.
+			if vv,ok := nv["#text"]; ok {
+				return vv, nil
+			} else {
+				// this happens when another element is value of tag rather than just a string value
+				return nv, nil
+			}
 	}
+	return nil, errors.New("no match for attributes")
+}
 
-	v,verr := MapValue(m,path)
-	if verr != nil {
-		return nil, verr
+// NewAttributeMap() - generate map of attributes=value entries as map["-"+string]string.
+//	'kv' arguments are "name:value" pairs that appear as attributes, name="value".
+func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
+	m := make(map[string]interface{},0)
+	for _,v := range kv {
+		vv := strings.Split(v,":")
+		if len(vv) != 2 {
+			return nil, errors.New("attribute not \"name:value\" pair: "+v)
+		}
+		// attributes are stored on keys prepended with hyphen
+		m["-"+vv[0]] = interface{}(vv[1])
 	}
-	return v, nil
+	return m, nil
 }
 
