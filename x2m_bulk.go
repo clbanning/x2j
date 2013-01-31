@@ -64,7 +64,7 @@ func ParseXmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bo
 
 	// now start reading the buffer and process messages
 	mout := make(chan msg,1)
-	go ReadDocsFromBuffer(b,mout,r)
+	go ReadMsgsFromBuffer(b,mout,r)
 	for {
 		m :=<-mout
 		if m.err != nil && m.err != io.EOF {
@@ -85,7 +85,7 @@ func ParseXmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bo
 }
 
 // start as a go routine to feed the file results
-func ReadDocsFromBuffer(b *bytes.Buffer, mout chan msg,recast ...bool) {
+func ReadMsgsFromBuffer(b *bytes.Buffer, mout chan msg,recast ...bool) {
 	var r bool
 	if len(recast) == 1 {
 		r = recast[0]
