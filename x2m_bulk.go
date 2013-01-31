@@ -111,7 +111,7 @@ func XmlBufferToMap(b *bytes.Buffer,recast ...bool) (map[string]interface{},erro
 		r = recast[0]
 	}
 
-	n,err := BufferToTree(b)
+	n,err := XmlBufferToTree(b)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +123,7 @@ func XmlBufferToMap(b *bytes.Buffer,recast ...bool) (map[string]interface{},erro
 }
 
 // BufferToTree - derived from DocToTree()
-func BufferToTree(b *bytes.Buffer) (*Node, error) {
+func XmlBufferToTree(b *bytes.Buffer) (*Node, error) {
 	p := xml.NewDecoder(b)
 	n, berr := xmlToTree("",nil,p)
 	if berr != nil {
