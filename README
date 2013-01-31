@@ -47,6 +47,15 @@ A couple of parsing conventions:
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
+BULK PROCESSING OF MESSAGE FILES
+
+Sometime messages may be logged into files for transmission via FTP (e.g.) and subsequent
+processing. You can use the bulk XML message processor to convert files of XML messages into 
+map[string]interface{} values with custom processing and error handler functions.  See
+the notes and test code for:
+
+	- ParseXmlMsgsFromFile(fname string, phandler(map[string]interface{}) bool, ehandler(erro) bool,recast ...bool) error
+
 IMPLEMENTATION NOTES
 
 Nothing fancy here, just brute force.

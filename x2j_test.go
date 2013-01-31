@@ -172,6 +172,19 @@ func TestGetValueWithAttr(t *testing.T) {
 		}
 	}
 
+	fmt.Println("\nDocValue(): Looking for empty nil")
+	v,verr = DocValue(doc,"")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
 	// test 'recast' switch
 	fmt.Println("\ntesting recast switch...")
 	mm,mmerr = DocToMap(doc,true)
@@ -193,5 +206,111 @@ func TestGetValueWithAttr(t *testing.T) {
 		} else {
 			fmt.Println(string(j))
 		}
+	}
+}
+
+func TestStuff_1(t *testing.T) {
+	doc := `<doc>
+				<tag item="1">val2</tag>
+				<tag item="2">val2</tag>
+				<tag item="2" instance="2">val3</tag>
+			</doc>`
+
+	fmt.Println(doc)
+	m,merr := DocToMap(doc)
+	if merr != nil {
+		fmt.Println("merr:",merr.Error())
+	} else {
+		fmt.Println(WriteMap(m))
+	}
+
+	fmt.Println("\nDocValue(): tag")
+	v,verr := DocValue(doc,"doc.tag")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
+	fmt.Println("\nDocValue(): item:2 instance:2")
+	v,verr = DocValue(doc,"doc.tag","item:2","instance:2")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+}
+
+func TestStuff_2(t *testing.T) {
+	doc := `<tag item="1">val2</tag>
+				<tag item="2">val2</tag>
+				<tag item="2" instance="2">val3</tag>`
+
+	fmt.Println(doc)
+	m,merr := DocToMap(doc)
+	if merr != nil {
+		fmt.Println("merr:",merr.Error())
+	} else {
+		fmt.Println(WriteMap(m))
+	}
+
+	fmt.Println("\nDocValue(): tag")
+	v,verr := DocValue(doc,"tag")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+
+	fmt.Println("\nDocValue(): item:2 instance:2")
+	v,verr = DocValue(doc,"tag","item:2","instance:2")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	} else {
+		j, jerr := json.MarshalIndent(v,"","  ")
+		if jerr != nil {
+			fmt.Println("jerr:",jerr.Error())
+		} else {
+			fmt.Println(string(j))
+		}
+	}
+}
+
+func procMap(m map[string]interface{}) bool {
+	fmt.Println("procMap:",WriteMap(m),"\n")
+	return true
+}
+
+func procMapToJson(m map[string]interface{}) bool {
+	b,_ := json.MarshalIndent(m,"","  ")
+	fmt.Println("procMap:",string(b),"\n")
+	return true
+}
+
+func procErr(err error) bool {
+	fmt.Println("procError err:",err.Error())
+	return true
+}
+
+func TestBulk(t *testing.T) {
+	fmt.Println("\nBulk Message Processing Tests")
+	// if err := ParseXmlMsgsFromFile("x2m_bulk.xml",procMap,procErr); err != nil {
+	if err := ParseXmlMsgsFromFile("x2m_bulk.xml",procMapToJson,procErr); err != nil {
+		fmt.Println("ParseXmlMsgsFromFile err:",err.Error())
 	}
 }

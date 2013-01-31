@@ -279,7 +279,7 @@ func recast(s string,r bool) interface{} {
 //	'offset' is initial indentation count; typically: WriteMap(m).
 //	NOTE: with XML all element types are 'string'.
 //	But code written as generic for use with maps[string]interface{} values from json.Unmarshal().
-// Or it can handle a DocToMap(doc,true) result where values have be recast'd.
+//	Or it can handle a DocToMap(doc,true) result where values have be recast'd.
 func WriteMap(m interface{}, offset ...int) string {
 	var indent int
 	if len(offset) == 1 {
@@ -336,7 +336,7 @@ func WriteMap(m interface{}, offset ...int) string {
 // DocValue - return a value for a specific tag
 //	'doc' is a valid XML message.
 //	'path' is a hierarchy of XML tags, e.g., "doc.name".
-// 'attrs' is an optional list of "name:value" pairs for attributes.
+//	'attrs' is an optional list of "name:value" pairs for attributes.
 //	Note: 'recast' is not enabled here. Use DocToMap(), NewAttributeMap(), and MapValue() calls for that.
 func DocValue(doc, path string, attrs ...string) (interface{},error) {
 	n,err := DocToTree(doc)
@@ -361,7 +361,7 @@ func DocValue(doc, path string, attrs ...string) (interface{},error) {
 // MapValue - retrieves value based on walking the map, 'm'.
 //	'm' is the map value of interest.
 //	'path' is a period-separated hierarchy of keys in the map.
-// 'attr' is a map of attribute "name:value" pairs from NewAttributeMap().
+//	'attr' is a map of attribute "name:value" pairs from NewAttributeMap().
 //	If the path can't be traversed, an error is returned.
 //	Note: the optional argument 'r' can be used to coerce attribute values, 'attr', if done so for 'm'.
 func MapValue(m map[string]interface{},path string, attr map[string]interface{}, r ...bool) (interface{}, error) {
@@ -378,8 +378,11 @@ func MapValue(m map[string]interface{},path string, attr map[string]interface{},
 	// initialize return value to 'm' so a path of "" will work correctly
 	var v interface{} = m
 	var ok bool
-	var isMap bool = true
 	var okey string
+	var isMap bool = true
+	if keys[0] == "" {
+		goto checkAttr
+	}
 	for _,key := range keys {
 		if !isMap {
 			return nil, errors.New("no keys beyond: "+okey)
@@ -399,6 +402,7 @@ func MapValue(m map[string]interface{},path string, attr map[string]interface{},
 		okey = key
 	}
 
+checkAttr:
 	// no attributes to match, then done
 	if len(attr) ==  0 {
 		return v, nil
