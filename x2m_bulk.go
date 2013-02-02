@@ -21,17 +21,12 @@ import (
 	"regexp"
 )
 
-type msg struct {
-	val map[string]interface{}
-	err error
-}
-
 // ParseXmlMsgsFromFile()
 //	'fname' is name of file
 //	'phandler' is the map processing handler. If return of 'false' stops further processing.
 //	'ehandler' is the parsing error handler. If return of 'false' stops further processing.
 //	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
-//	      This means that you can stop reading the file on error or on processing a particular message.
+//	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass arguments to a go routine in handler and return true.
 func ParseXmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bool), ehandler func(error)(bool), recast ...bool) error {
 	var r bool
@@ -59,52 +54,29 @@ func ParseXmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bo
 	reg,_ := regexp.Compile("[ \t\n\r]*<")
 	doc = reg.ReplaceAllString(doc,"<")
 	b := bytes.NewBufferString(doc)
-	// indirectly stop go routine if it's still running
-	defer b.Reset()
 
-	// now start reading the buffer and process messages
-	mout := make(chan msg,1)
-	go ReadMsgsFromBuffer(b,mout,r)
 	for {
-		m :=<-mout
-		if m.err != nil && m.err != io.EOF {
-			if ok := ehandler(m.err); !ok {
+		m, merr := XmlBufferToMap(b,r)
+		if merr != nil && merr != io.EOF {
+			if ok := ehandler(merr); !ok {
 				break
 			 }
 		}
-		if m.val != nil {
-			if ok := phandler(m.val); !ok {
+		if m != nil {
+			if ok := phandler(m); !ok {
 				break
 			}
 		}
-		if m.err == io.EOF {
+		if merr == io.EOF {
 			break
 		}
 	}
 	return nil
 }
 
-// start as a go routine to feed the file results
-func ReadMsgsFromBuffer(b *bytes.Buffer, mout chan msg,recast ...bool) {
-	var r bool
-	if len(recast) == 1 {
-		r = recast[0]
-	}
-	for {
-		m := new(msg)
-		m.val, m.err = XmlBufferToMap(b,r)
-		if m.err != nil {
-			if m.err == io.EOF {
-				mout<- *m
-				return
-			}
-			mout<- *m
-		}
-		mout<- *m
-	}
-}
-
-// XmlBufferToMap - derived from DocToMap()
+// XmlBufferToMap - process XML message from a bytes.Buffer
+//	'b' is the buffer
+//	Optional argument 'recast' coerces map values to float64 or bool where possible.
 func XmlBufferToMap(b *bytes.Buffer,recast ...bool) (map[string]interface{},error) {
 	var r bool
 	if len(recast) == 1 {
