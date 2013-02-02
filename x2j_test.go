@@ -309,8 +309,8 @@ func procErr(err error) bool {
 
 func TestBulk(t *testing.T) {
 	fmt.Println("\nBulk Message Processing Tests")
-	// if err := ParseXmlMsgsFromFile("x2m_bulk.xml",procMap,procErr); err != nil {
-	if err := ParseXmlMsgsFromFile("x2m_bulk.xml",procMapToJson,procErr); err != nil {
-		fmt.Println("ParseXmlMsgsFromFile err:",err.Error())
+	// if err := XmlMsgsFromFile("x2m_bulk.xml",procMap,procErr); err != nil {
+	if err := XmlMsgsFromFile("x2m_bulk.xml",procMapToJson,procErr); err != nil {
+		fmt.Println("XmlMsgsFromFile err:",err.Error())
 	}
 }

@@ -54,7 +54,7 @@ processing. You can use the bulk XML message processor to convert files of XML m
 map[string]interface{} values with custom processing and error handler functions.  See
 the notes and test code for:
 
-	- ParseXmlMsgsFromFile(fname string, phandler func(map[string]interface{}) bool, ehandler func(error) bool,recast ...bool) error
+	- XmlMsgsFromFile(fname string, phandler func(map[string]interface{}) bool, ehandler func(error) bool,recast ...bool) error
 
 IMPLEMENTATION NOTES
 

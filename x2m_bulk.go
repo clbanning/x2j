@@ -21,14 +21,14 @@ import (
 	"regexp"
 )
 
-// ParseXmlMsgsFromFile()
+// XmlMsgsFromFile()
 //	'fname' is name of file
 //	'phandler' is the map processing handler. If return of 'false' stops further processing.
 //	'ehandler' is the parsing error handler. If return of 'false' stops further processing.
 //	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass arguments to a go routine in handler and return true.
-func ParseXmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bool), ehandler func(error)(bool), recast ...bool) error {
+func XmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bool), ehandler func(error)(bool), recast ...bool) error {
 	var r bool
 	if len(recast) == 1 {
 		r = recast[0]
