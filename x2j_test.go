@@ -314,3 +314,23 @@ func TestBulk(t *testing.T) {
 		fmt.Println("XmlMsgsFromFile err:",err.Error())
 	}
 }
+
+func TestBulkBuffer(t *testing.T) {
+	fmt.Println("\nTest arbitrary XML buffer")
+	doc := `<doc><tag /></doc><doc><one att="1">my test doc</one></doc><doc><tag>missing end element</tag>`
+	b := NewXmlBuffer(doc)
+	for {
+		m,merr := b.NextMap()
+		if merr != nil {
+			fmt.Println("merr:",merr.Error())
+		}
+		if m == nil {
+			break
+		}
+		fmt.Println("m:",m)
+	}
+	b.Close()
+	_,err := b.NextMap()
+	fmt.Println("err:",err.Error())
+}
+

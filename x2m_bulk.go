@@ -16,6 +16,7 @@ package x2j
 import (
 	"bytes"
 	"encoding/xml"
+	"errors"
 	"io"
 	"os"
 	"regexp"
@@ -105,4 +106,45 @@ func XmlBufferToTree(b *bytes.Buffer) (*Node, error) {
 	return n,nil
 }
 
+// XmlBuffer - create XML decoder buffer for a string from anywhere, not necessarily a file.
+type XmlBuffer struct {
+	cnt int64
+	str *string
+	buf *bytes.Buffer
+}
+var cnt int64
+var activeXmlBufs = make(map[int64]*XmlBuffer)
 
+// NewXmlBuffer() - creates a bytes.Buffer from a string with multiple messages
+//	Use Close() function to release the buffer for garbage collection.
+func NewXmlBuffer(s string) *XmlBuffer {
+	// xml.Decoder doesn't properly handle whitespace in some doc
+	// see songTextString.xml test case ... 
+	reg,_ := regexp.Compile("[ \t\n\r]*<")
+	s = reg.ReplaceAllString(s,"<")
+	b := bytes.NewBufferString(s)
+	buf := new(XmlBuffer)
+	buf.cnt = cnt ; cnt++
+	buf.str = &s
+	buf.buf = b
+	activeXmlBufs[buf.cnt] = buf
+	return buf
+}
+
+// Close() - release the buffer address for garbage collection
+func (b *XmlBuffer)Close() {
+	delete(activeXmlBufs,b.cnt)
+}
+
+// NextMap() - retrieve next XML message in buffer as a map[string]interface{} value.
+//	The optional argument 'recast' will try and coerce values to float64 or bool as appropriate.
+func (b *XmlBuffer)NextMap(recast ...bool) (map[string]interface{}, error) {
+		var r bool
+		if len(recast) == 1 {
+			r = recast[0]
+		}
+		if _, ok := activeXmlBufs[b.cnt]; !ok {
+			return nil, errors.New("Buffer is not active.")
+		}
+		return XmlBufferToMap(b.buf,r)
+}
