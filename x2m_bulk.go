@@ -105,12 +105,12 @@ func XmlBufferToTree(b *bytes.Buffer) (*Node, error) {
 
 // XmlBuffer - create XML decoder buffer for a string from anywhere, not necessarily a file.
 type XmlBuffer struct {
-	cnt int64
+	cnt uint64
 	str *string
 	buf *bytes.Buffer
 }
-var cnt int64
-var activeXmlBufs = make(map[int64]*XmlBuffer)
+var cnt uint64
+var activeXmlBufs = make(map[uint64]*XmlBuffer)
 
 // NewXmlBuffer() - creates a bytes.Buffer from a string with multiple messages
 //	Use Close() function to release the buffer for garbage collection.
