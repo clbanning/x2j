@@ -39,6 +39,12 @@ syntax in Websphere MQ Broker ESQL programming).  It is the program's responsibi
 cast the returned value to the proper type; possible types are the normal JSON 
 unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
 
+To retrieve all values associated with a tag occurring anywhere in the XML document use:
+
+	- ValuesForTag(doc, tag string) ([]interface{}, error)
+
+Returned values should be one of map[string]interface, []interface{}, or string.
+
 A couple of parsing conventions:
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',

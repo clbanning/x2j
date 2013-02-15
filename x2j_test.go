@@ -355,6 +355,7 @@ func TestTagAndKey(t *testing.T) {
 				</sections>
 			</parts>
 		</partitions>	
+		<end>this is the end</end>
 	</doc>`
 
 	fmt.Println("\nTestTagAndKey()\n",doc)
@@ -382,5 +383,12 @@ func TestTagAndKey(t *testing.T) {
 		fmt.Println("no 'not_a_key' key")
 	} else {
 		fmt.Println("key: not_a-key :: len:",len(v),"v:",v)
+	}
+
+	v = ValuesForKey(m,"end")
+	if v == nil {
+		fmt.Println("no 'end' key")
+	} else {
+		fmt.Println("key: end :: len:",len(v),"v:",v)
 	}
 }
