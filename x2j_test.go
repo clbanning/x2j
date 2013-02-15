@@ -334,3 +334,53 @@ func TestBulkBuffer(t *testing.T) {
 	fmt.Println("err:",err.Error())
 }
 
+
+func TestTagAndKey(t *testing.T) {
+	var doc string
+	doc = `<doc>
+		<sections>
+			<section>one</section>
+			<section>
+				<parts>
+					<part>two.one</part>
+					<part>two.two</part>
+				</parts>
+			</section>
+		</sections>
+		<partitions>
+			<parts>
+				<sections>
+					<section>one</section>
+					<section>two</section>
+				</sections>
+			</parts>
+		</partitions>	
+	</doc>`
+
+	fmt.Println("\nTestTagAndKey()\n",doc)
+	v,verr := ValuesForTag(doc,"parts")
+	if verr != nil {
+		fmt.Println("verr:",verr.Error())
+	}
+	fmt.Println("tag: parts :: len:",len(v),"v:",v)
+	v, _ = ValuesForTag(doc,"not_a_tag")
+	if v == nil {
+		fmt.Println("no 'not_a_tag' tag")
+	} else {
+		fmt.Println("key: not_a_tag :: len:",len(v),"v:",v)
+	}
+
+	m,merr := DocToMap(doc)
+	if merr != nil {
+		fmt.Println("merr:",merr.Error())
+	}
+	v = ValuesForKey(m,"section")
+	fmt.Println("key: section :: len:",len(v),"v:",v)
+
+	v = ValuesForKey(m,"not_a_key")
+	if v == nil {
+		fmt.Println("no 'not_a_key' key")
+	} else {
+		fmt.Println("key: not_a-key :: len:",len(v),"v:",v)
+	}
+}

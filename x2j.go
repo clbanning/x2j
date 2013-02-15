@@ -453,9 +453,60 @@ func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
 		if len(vv) != 2 {
 			return nil, errors.New("attribute not \"name:value\" pair: "+v)
 		}
-		// attributes are stored on keys prepended with hyphen
+		// attributes are stored as keys prepended with hyphen
 		m["-"+vv[0]] = interface{}(vv[1])
 	}
 	return m, nil
 }
+
+//------------------------- get values for key ----------------------------
+
+// ValuesForTag - return all values in doc associated with 'tag'.
+//	Returns nil if the 'tag' does not occur in the doc.
+//	If there is an error encounted while parsing doc, that is returned.
+//	If you want values 'recast' use DocToMap() and ValuesForKey().
+func ValuesForTag(doc, key string) ([]interface{}, error) {
+	n,err := DocToTree(doc)
+	if err != nil {
+		return nil,err
+	}
+
+	m := make(map[string]interface{})
+	m[n.key] = n.treeToMap(false)
+
+	return ValuesForKey(m,key), nil
+}
+
+
+// ValuesForKey - return all values in map associated with 'key' 
+//	Returns nil if the 'key' does not occur in the map
+func ValuesForKey(m map[string]interface{}, key string) []interface{} {
+	ret := make([]interface{},0)
+
+	hasKey(m,key,&ret)
+	if len(ret) > 0 {
+		return ret
+	}
+	return nil
+}
+
+// hasKey - if the map 'key' exists append it to array
+//          if it doesn't do nothing except scan array and map values
+func hasKey(iv interface{},key string,ret *[]interface{}) {
+	switch iv.(type) {
+		case map[string]interface{}:
+			vv := iv.(map[string]interface{})
+			if v,ok := vv[key]; ok {
+				*ret = append(*ret,v)
+			}
+			for _,v := range iv.(map[string]interface{}) {
+				hasKey(v,key,ret)
+			}
+		case []interface{}:
+			for _,v := range iv.([]interface{}) {
+				hasKey(v,key,ret)
+			}
+	}
+}
+
 
