@@ -226,7 +226,7 @@ func (n *Node)markDuplicateKeys() {
 
 // (*Node)treeToMap - convert a tree of nodes into a map[string]interface{}.
 //	(Parses to map that is structurally the same as from json.Unmarshal().)
-// Note: root is not instantiated; call with: "m[n.key] = treeToMap()".
+// Note: root is not instantiated; call with: "m[n.key] = n.treeToMap(recast)".
 func (n *Node)treeToMap(r bool) interface{} {
 	if len(n.nodes) == 0 {
 		return recast(n.val,r)
@@ -465,7 +465,7 @@ func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
 //	Returns nil if the 'tag' does not occur in the doc.
 //	If there is an error encounted while parsing doc, that is returned.
 //	If you want values 'recast' use DocToMap() and ValuesForKey().
-func ValuesForTag(doc, key string) ([]interface{}, error) {
+func ValuesForTag(doc, tag string) ([]interface{}, error) {
 	n,err := DocToTree(doc)
 	if err != nil {
 		return nil,err
@@ -474,7 +474,7 @@ func ValuesForTag(doc, key string) ([]interface{}, error) {
 	m := make(map[string]interface{})
 	m[n.key] = n.treeToMap(false)
 
-	return ValuesForKey(m,key), nil
+	return ValuesForKey(m,tag), nil
 }
 
 
