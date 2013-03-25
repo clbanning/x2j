@@ -1,9 +1,8 @@
+// Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string. 
 // Copyright 2012-2013 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*	
-	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string. 
-
 	DocToMap() returns an intermediate result with the XML doc unmarshal'd to a map
 	of type map[string]interface{}. It is analogous to unmarshal'ng a JSON string to
 	a map using json.Unmarshal(). (This was the original purpose of this library.)
