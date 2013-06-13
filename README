@@ -33,6 +33,7 @@ with 'fmt' library.
 To retrieve a value for specific tag use: 
 
     - DocValue(doc, path string, attrs ...string) (interface{},error) 
+    - MapValue(m map[string]interface{}, path string, attr map[string]interface{}, recast ...bool) (interface{}, error)
 
 The 'path' argument is a period-separated tag hierarchy (similar to 'relative variable'
 syntax in Websphere MQ Broker ESQL programming).  It is the program's responsibility to
@@ -41,9 +42,24 @@ unmarshaling types: string, float64, bool, []interface, map[string]interface{}.
 
 To retrieve all values associated with a tag occurring anywhere in the XML document use:
 
-	- ValuesForTag(doc, tag string) ([]interface{}, error)
+    - ValuesForTag(doc, tag string) ([]interface{}, error)
+    - ValuesForKey(m map[string]interface{}, key string) []interface{}
+
+    Demos: http://play.golang.org/p/m8zP-cpk0O
+           http://play.golang.org/p/cIteTS1iSg
 
 Returned values should be one of map[string]interface, []interface{}, or string.
+
+All the values assocated with a tag-path that may include one or more wildcard characters - 
+'*' - can also be retrieved using:
+
+    - ValuesFromTagPath(doc, path string) ([]interface{}, error)
+    - ValuesFromKeyPath(map[string]interface{}, path string) []interface{}
+
+    Demos: http://play.golang.org/p/WIH63egkXd
+           http://play.golang.org/p/cszWD-PQTl
+
+See the test cases in "x2jpath_test.go" for more examples.
 
 A couple of parsing conventions:
 
@@ -119,3 +135,5 @@ BenchmarkBig3_UseXml-4        100000    24686        100000    23780      4%
 BenchmarkBig3_UseX2j-4         20000    84332         20000    81703      3%
 BenchmarkBig3_UseJson-4       500000     3930        500000     3862      2%
 BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     8427      3%
+
+Demos:

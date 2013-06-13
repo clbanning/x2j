@@ -1,8 +1,10 @@
-// Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string. 
+//	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string. 
 // Copyright 2012-2013 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*	
+	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string. 
+
 	DocToMap() returns an intermediate result with the XML doc unmarshal'd to a map
 	of type map[string]interface{}. It is analogous to unmarshal'ng a JSON string to
 	a map using json.Unmarshal(). (This was the original purpose of this library.)
@@ -508,4 +510,98 @@ func hasKey(iv interface{},key string,ret *[]interface{}) {
 	}
 }
 
+// ------------------- sweep up everything for some point in the node tree ---------------------
+
+// ValuesFromTagPath - deliver all values for a path node from a XML doc
+//   'doc' is the XML document
+//   'path' is a dot-separated path of tag nodes
+//          If a node is '*', then everything beyond is scanned for values.
+//          E.g., "doc.books' might return a single value 'book' of type []interface{}, but
+//                "doc.books.*" could return all the 'book' entries as []map[string]interface{}.
+//                "doc.books.*.author" might return all the 'author' tag values as []string - or
+//            		"doc.books.*.author.lastname" might be required, depending on he schema.
+func ValuesFromTagPath(doc,path string) ([]interface{}, error) {
+	m,err := DocToMap(doc)
+	if err != nil {
+		return nil,err
+	}
+
+	v := ValuesFromKeyPath(m,path)
+	return v, nil
+}
+
+// ValuesFromKeyPath - deliver all values for a path node from a map[string]interface{}
+//   'm' is the map to be walked
+//   'path' is a dot-separated path of key values
+//          If a node is '*', then everything beyond is walked.
+//          E.g., see ValuesForTagPath documentation. 
+func ValuesFromKeyPath(m map[string]interface{},path string) []interface{} {
+	keys := strings.Split(path,".")
+	return valuesFromKeyPath(m,keys)
+}
+
+func valuesFromKeyPath(m map[string]interface{},keys []string) []interface{} {
+	ret := make([]interface{},0)
+
+	var v interface{}
+	var ok bool
+	for i := 0 ; i < len(keys) ; i++ {
+		key := keys[i]
+		// first see if its a wildcard
+		if key == "*" && i < len(keys)-1 {
+			for _,v := range m {
+				switch v.(type) {
+					case map[string]interface{}:
+						ret = append(ret,(valuesFromKeyPath(v.(map[string]interface{}),keys[i+1:]))...)
+					case []interface{}:
+						for _,vv := range v.([]interface{}) {
+							switch vv.(type) {
+								case map[string]interface{}:
+									ret = append(ret,(valuesFromKeyPath(vv.(map[string]interface{}),keys[i+1:]))...)
+							}
+						}
+				}
+			// we've processed everything downstream
+			return ret
+			}
+		} else if key == "*" && i == len(keys)-1 {
+			// at the end of the path
+			// wildcard "*" at end of path sweeps up all values
+			mm := make([]interface{},0)
+			for _,v := range m {
+				mm = append(mm,v.(interface{}))
+			}
+			v = interface{}(mm)
+			break
+		}
+		// done handling "*"; now 'key' must be in 'path'
+		if  v,ok = m[key]; !ok {
+			return nil
+		}
+
+		// advance along the path? NOTE: non-map[string]interface{} types already parsed
+		// more keys to come, perhaps
+		if i < len(keys)-1 {
+			switch v.(type) {
+				case map[string]interface{}:
+					m = v.(map[string]interface{})
+				default:
+					// won't be able to walk to next key
+					return nil
+			}
+		}
+	}
+
+	// m is sitting at the end of the path, loadup everything there
+	// don't known what types are there so handle several cases
+	switch v.(type) {
+		case []interface{}:
+			for _,vv := range v.([]interface{}) {
+				ret = append(ret,vv.(interface{}))
+			}
+		default:
+			ret = append(ret,v)
+	}
+	return ret
+}
 
