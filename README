@@ -105,17 +105,17 @@ BenchmarkBig3_UseJsonToMap-4  200000    13037        200000     8670     33%
 
 The x2j package gets an additional 3% performance boost from Go 1.1.1.
 
-                           ------ Go 1.1 ------   ---------- Go 1.1.1-----------
+                           ------ Go 1.1 ------   --------- Go 1.1.1+ ----------
                             iterations  ns/op      iterations  ns/op  % improved
-Benchmark_UseXml-4            200000    10377        200000    10122      2%
-Benchmark_UseX2j-4             50000    33958         50000    33054      3%
-Benchmark_UseJson-4          1000000     1484       1000000     1461      2%
-Benchmark_UseJsonToMap-4     1000000     1566       1000000     1546      1%
-BenchmarkBig_UseXml-4         100000    15876        100000    15509      2%
-BenchmarkBig_UseX2j-4          50000    52661         50000    51157      3%
-BenchmarkBig_UseJson-4       1000000     2664       1000000     2589      3%
-BenchmarkBig_UseJsonToMap-4   500000     5753        500000     5592      3%
-BenchmarkBig3_UseXml-4        100000    24686        100000    24096      2%
-BenchmarkBig3_UseX2j-4         20000    84332         20000    82023      3%
-BenchmarkBig3_UseJson-4       500000     3930        500000     4000     -2%
-BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     8759     -1%
+Benchmark_UseXml-4            200000    10377        200000    10152      2%
+Benchmark_UseX2j-4             50000    33958         50000    33232      2%
+Benchmark_UseJson-4          1000000     1484       1000000     1466      1%
+Benchmark_UseJsonToMap-4     1000000     1566       1000000     1550      1%
+BenchmarkBig_UseXml-4         100000    15876        100000    15551      2%
+BenchmarkBig_UseX2j-4          50000    52661         50000    51227      3%
+BenchmarkBig_UseJson-4       1000000     2664       1000000     2591      3%
+BenchmarkBig_UseJsonToMap-4   500000     5753        500000     5593      3%
+BenchmarkBig3_UseXml-4        100000    24686        100000    23780      4%
+BenchmarkBig3_UseX2j-4         20000    84332         20000    81703      3%
+BenchmarkBig3_UseJson-4       500000     3930        500000     3862      2%
+BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     8427      3%
