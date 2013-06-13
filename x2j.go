@@ -513,6 +513,8 @@ func hasKey(iv interface{},key string,ret *[]interface{}) {
 // ------------------- sweep up everything for some point in the node tree ---------------------
 
 // ValuesFromTagPath - deliver all values for a path node from a XML doc
+// If there are no values for the path 'nil' is returned.
+// A return value of (nil, nil) means that there were no values and no errors parsing the doc.
 //   'doc' is the XML document
 //   'path' is a dot-separated path of tag nodes
 //          If a node is '*', then everything beyond is scanned for values.
@@ -531,13 +533,18 @@ func ValuesFromTagPath(doc,path string) ([]interface{}, error) {
 }
 
 // ValuesFromKeyPath - deliver all values for a path node from a map[string]interface{}
+// If there are no values for the path 'nil' is returned.
 //   'm' is the map to be walked
 //   'path' is a dot-separated path of key values
 //          If a node is '*', then everything beyond is walked.
 //          E.g., see ValuesForTagPath documentation. 
 func ValuesFromKeyPath(m map[string]interface{},path string) []interface{} {
 	keys := strings.Split(path,".")
-	return valuesFromKeyPath(m,keys)
+	if v := valuesFromKeyPath(m,keys); len(v) == 0 {
+		return nil
+	} else {
+		return v
+	}
 }
 
 func valuesFromKeyPath(m map[string]interface{},keys []string) []interface{} {
