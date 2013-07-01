@@ -21,14 +21,11 @@ rather than just 'x2m'.
 
 USAGE
 
-The package is fairly well self-documented.  The two really useful functions are:
+The package is fairly well self-documented.  The one really useful function is:
 
-    - DocToMap(s string, recast ...bool) (map[string]interface{}, error)
-    - DocToJson(s string, recast ...bool) (string, error)
-
-They do just what they say. Other stuff is there if you want to examine intermediate
-results or print out the map in a more readable form than you get printing map values
-with 'fmt' library.
+    - Unmarshal(doc []byte, v interface{}) error  
+      where v is a pointer to a variable of type 'map[string]interface{}', 'string', or
+      any other type supported by xml.Unmarshal().
 
 To retrieve a value for specific tag use: 
 
