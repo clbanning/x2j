@@ -4,12 +4,14 @@
 // license that can be found in the LICENSE file
 /*
 	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string.
+	x2j.Unmarshal does that by wrapping xml.Unmarshal.
 
-	DocToMap() returns an intermediate result with the XML doc unmarshal'd to a map
-	of type map[string]interface{}. It is analogous to unmarshal'ng a JSON string to
-	a map using json.Unmarshal(). (This was the original purpose of this library.)
-
-	DocToTree()/WriteTree() let you examine the parsed XML doc.
+	Intermediate functions that can be useful are:
+		DocToJson() returns the XML as a JSON object of type string.
+		DocToMap() returns an intermediate result with the XML doc unmarshal'd to a map
+		           of type map[string]interface{}. It is analogous to unmarshal'ng a JSON string to
+		           a map using json.Unmarshal(). (This was the original purpose of this library.)
+		DocToTree()/WriteTree() let you examine the parsed XML doc.
 
 	XML values are all type 'string'. The optional argument 'recast' for DocToJson()
 	and DocToMap() will convert element values to JSON data types - 'float64' and 'bool' -
