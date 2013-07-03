@@ -618,7 +618,9 @@ func valuesFromKeyPath(m map[string]interface{}, keys []string) []interface{} {
 // Unmarshal - wraps xml.Unmarshal with handling of map[string]interface{}
 // and string type variables. 
 //	Usage: x2j.Unmarshal([]byte(doc),&m) where m of type map[string]interface{}
-//	       x2j.Unmarshal([]byte(doc),&s) where s of type string
+//	       x2j.Unmarshal([]byte(doc),&s) where s of type string (Overrides xml.Unmarshal().)
+//	       x2j.Unmarshal([]byte(doc),&struct) - passed to xml.Unmarshal()
+//	       x2j.Unmarshal([]byte(doc),&slice) - passed to xml.Unmarshal()
 func Unmarshal(doc []byte, v interface{}) error {
 	switch v.(type) {
 	case *map[string]interface{}:
