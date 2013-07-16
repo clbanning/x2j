@@ -511,6 +511,7 @@ func hasKey(iv interface{}, key string, ret *[]interface{}) {
 	}
 }
 
+/*
 // ------------------- sweep up everything for some point in the node tree ---------------------
 
 // ValuesFromTagPath - deliver all values for a path node from a XML doc
@@ -612,6 +613,7 @@ func valuesFromKeyPath(m map[string]interface{}, keys []string) []interface{} {
 	}
 	return ret
 }
+*/
 
 // ======== 2013.07.01 - x2j.Unmarshal, wraps xml.Unmarshal ==============
 
