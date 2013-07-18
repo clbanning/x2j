@@ -1,10 +1,11 @@
-//	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string.
+//	Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
 // Copyright 2012-2013 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*
 	Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
-	x2j.Unmarshal does that by wrapping xml.Unmarshal.
+
+	x2j.Unmarshal wraps xml.Unmarshal.
 
 	Intermediate functions that can be useful are:
 		DocToJson() returns the XML as a JSON object of type string.
