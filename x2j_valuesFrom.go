@@ -16,6 +16,7 @@ import (
 // A return value of (nil, nil) means that there were no values and no errors parsing the doc.
 //   'doc' is the XML document
 //   'path' is a dot-separated path of tag nodes
+//   'getAttrs' can be set 'true' to return attribute values for "*"-terminated path
 //          If a node is '*', then everything beyond is scanned for values.
 //          E.g., "doc.books' might return a single value 'book' of type []interface{}, but
 //                "doc.books.*" could return all the 'book' entries as []map[string]interface{}.
@@ -39,6 +40,7 @@ func ValuesFromTagPath(doc, path string, getAttrs ...bool) ([]interface{}, error
 // If there are no values for the path 'nil' is returned.
 //   'm' is the map to be walked
 //   'path' is a dot-separated path of key values
+//   'getAttrs' can be set 'true' to return attribute values for "*"-terminated path
 //          If a node is '*', then everything beyond is walked.
 //          E.g., see ValuesForTagPath documentation.
 func ValuesFromKeyPath(m map[string]interface{}, path string, getAttrs ...bool) []interface{} {
@@ -106,10 +108,6 @@ func valuesFromKeyPath(ret *[]interface{}, m interface{}, keys []string, getAttr
 		switch m.(type) {
 		case map[string]interface{}:
 			if v, ok := m.(map[string]interface{})[key]; ok {
-//				if lenKeys == 1 {
-//					*ret = append(*ret, v)
-//					return
-//				}
 				valuesFromKeyPath(ret, v, keys[1:], getAttrs)
 			}
 		case []interface{}: // may be buried in list
