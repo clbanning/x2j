@@ -31,6 +31,7 @@ func TestX2j(t *testing.T) {
 	root, berr := DocToTree(doc)
 	if berr != nil {
 		fmt.Println("berr:",berr.Error())
+		fmt.Println("root:",root)
 		return
 	}
 	fmt.Println("\nDocToTree():\n",root.WriteTree())
@@ -147,7 +148,7 @@ func TestGetValueWithAttr(t *testing.T) {
 
 	fmt.Println("\nMapValue(): Looking for hello item:4")
 	a,_ = NewAttributeMap("item:4")
-	v,verr = MapValue(v.(map[string]interface{}),"hello",a)
+	v,verr = MapValue(mm,"hello",a)
 	if verr != nil {
 		fmt.Println("verr:",verr.Error())
 	} else {
@@ -355,7 +356,6 @@ func TestTagAndKey(t *testing.T) {
 				</sections>
 			</parts>
 		</partitions>	
-		<end>this is the end</end>
 	</doc>`
 
 	fmt.Println("\nTestTagAndKey()\n",doc)
@@ -384,11 +384,36 @@ func TestTagAndKey(t *testing.T) {
 	} else {
 		fmt.Println("key: not_a-key :: len:",len(v),"v:",v)
 	}
-
-	v = ValuesForKey(m,"end")
-	if v == nil {
-		fmt.Println("no 'end' key")
-	} else {
-		fmt.Println("key: end :: len:",len(v),"v:",v)
-	}
 }
+
+// ---------------- x2j_fast.go ----------------
+/*
+func Test_F_DocToMap(t *testing.T) {
+	var doc string = `<doc>
+		<sections>
+			<section>one</section>
+			<section>
+				<parts>
+					<part>two.one</part>
+					<part>two.two</part>
+				</parts>
+			</section>
+		</sections>
+		<partitions>
+			<parts>
+				<sections>
+					<section>one</section>
+					<section>two</section>
+				</sections>
+			</parts>
+		</partitions>	
+	</doc>`
+	fmt.Println("\nF_DocToMap()")
+	fmt.Println(doc)
+	m,err := F_DocToMap(doc)
+	if err != nil {
+		fmt.Println("err:",err.Error())
+	}
+	fmt.Println(WriteMap(m),"\n")
+}
+*/

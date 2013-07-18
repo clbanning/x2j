@@ -21,7 +21,8 @@ rather than just 'x2m'.
 
 USAGE
 
-The package is fairly well self-documented.  The one really useful function is:
+The package is fairly well self-documented. (http://godoc.org/github.com/clbanning/x2j)  
+The one really useful function is:
 
     - Unmarshal(doc []byte, v interface{}) error  
       where v is a pointer to a variable of type 'map[string]interface{}', 'string', or
@@ -50,19 +51,24 @@ Returned values should be one of map[string]interface, []interface{}, or string.
 All the values assocated with a tag-path that may include one or more wildcard characters - 
 '*' - can also be retrieved using:
 
-    - ValuesFromTagPath(doc, path string) ([]interface{}, error)
-    - ValuesFromKeyPath(map[string]interface{}, path string) []interface{}
+    - ValuesFromTagPath(doc, path string, getAttrs ...bool) ([]interface{}, error)
+    - ValuesFromKeyPath(map[string]interface{}, path string, getAttrs ...bool) []interface{}
 
-    Demos: http://play.golang.org/p/WIH63egkXd
-           http://play.golang.org/p/cszWD-PQTl
+    Demos: http://play.golang.org/p/kUQnZ8VuhS
+	        http://play.golang.org/p/l1aMHYtz7G
 
-See the test cases in "x2jpath_test.go" for more examples.
+NOTE: care should be taken when using "*" at the end of a path - i.e., "books.book.*".  See
+the x2jpath_test.go case on how the wildcard returns all key values and collapses list values;
+the same message structure can load a []interface{} or a map[string]interface{} (or an interface{}) 
+value for a tag.
 
-A couple of parsing conventions:
+See the test cases in "x2jpath_test.go" and programs in "example" subdirectory for more.
+
+XML PARSING CONVENTIONS
 
    - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
      to the attribute label.
-   - If the element is not a complex element and it has attributes, the element value
+   - If the element is a simple element and has attributes, the element value
      is given the key '#text' for its map[string]interface{} representation.  (See
      the 'atomFeedString.xml' test data, below.)
 
@@ -133,4 +139,3 @@ BenchmarkBig3_UseX2j-4         20000    84332         20000    81703      3%
 BenchmarkBig3_UseJson-4       500000     3930        500000     3862      2%
 BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     8427      3%
 
-Demos:

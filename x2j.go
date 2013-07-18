@@ -511,114 +511,10 @@ func hasKey(iv interface{}, key string, ret *[]interface{}) {
 	}
 }
 
-/*
-// ------------------- sweep up everything for some point in the node tree ---------------------
-
-// ValuesFromTagPath - deliver all values for a path node from a XML doc
-// If there are no values for the path 'nil' is returned.
-// A return value of (nil, nil) means that there were no values and no errors parsing the doc.
-//   'doc' is the XML document
-//   'path' is a dot-separated path of tag nodes
-//          If a node is '*', then everything beyond is scanned for values.
-//          E.g., "doc.books' might return a single value 'book' of type []interface{}, but
-//                "doc.books.*" could return all the 'book' entries as []map[string]interface{}.
-//                "doc.books.*.author" might return all the 'author' tag values as []string - or
-//            		"doc.books.*.author.lastname" might be required, depending on he schema.
-func ValuesFromTagPath(doc, path string) ([]interface{}, error) {
-	m, err := DocToMap(doc)
-	if err != nil {
-		return nil, err
-	}
-
-	v := ValuesFromKeyPath(m, path)
-	return v, nil
-}
-
-// ValuesFromKeyPath - deliver all values for a path node from a map[string]interface{}
-// If there are no values for the path 'nil' is returned.
-//   'm' is the map to be walked
-//   'path' is a dot-separated path of key values
-//          If a node is '*', then everything beyond is walked.
-//          E.g., see ValuesForTagPath documentation.
-func ValuesFromKeyPath(m map[string]interface{}, path string) []interface{} {
-	keys := strings.Split(path, ".")
-	if v := valuesFromKeyPath(m, keys); len(v) == 0 {
-		return nil
-	} else {
-		return v
-	}
-}
-
-func valuesFromKeyPath(m map[string]interface{}, keys []string) []interface{} {
-	ret := make([]interface{}, 0)
-
-	var v interface{}
-	var ok bool
-	for i := 0; i < len(keys); i++ {
-		key := keys[i]
-		// first see if its a wildcard
-		if key == "*" && i < len(keys)-1 {
-			for _, v := range m {
-				switch v.(type) {
-				case map[string]interface{}:
-					ret = append(ret, (valuesFromKeyPath(v.(map[string]interface{}), keys[i+1:]))...)
-				case []interface{}:
-					for _, vv := range v.([]interface{}) {
-						switch vv.(type) {
-						case map[string]interface{}:
-							ret = append(ret, (valuesFromKeyPath(vv.(map[string]interface{}), keys[i+1:]))...)
-						}
-					}
-				}
-				// we've processed everything downstream
-				return ret
-			}
-		} else if key == "*" && i == len(keys)-1 {
-			// at the end of the path
-			// wildcard "*" at end of path sweeps up all values
-			mm := make([]interface{}, 0)
-			for _, v := range m {
-				mm = append(mm, v.(interface{}))
-			}
-			v = interface{}(mm)
-			break
-		}
-		// done handling "*"; now 'key' must be in 'path'
-		if v, ok = m[key]; !ok {
-			return nil
-		}
-
-		// advance along the path? NOTE: non-map[string]interface{} types already parsed
-		// more keys to come, perhaps
-		if i < len(keys)-1 {
-			switch v.(type) {
-			case map[string]interface{}:
-				m = v.(map[string]interface{})
-			default:
-				// won't be able to walk to next key
-				return nil
-			}
-		}
-	}
-
-	// m is sitting at the end of the path, loadup everything there
-	// don't known what types are there so handle several cases
-	switch v.(type) {
-	case []interface{}:
-		for _, vv := range v.([]interface{}) {
-			ret = append(ret, vv.(interface{}))
-		}
-	default:
-		ret = append(ret, v)
-	}
-	return ret
-}
-*/
-
 // ======== 2013.07.01 - x2j.Unmarshal, wraps xml.Unmarshal ==============
 
 // Unmarshal - wraps xml.Unmarshal with handling of map[string]interface{}
-// and string type variables. 
+// and string type variables.
 //	Usage: x2j.Unmarshal([]byte(doc),&m) where m of type map[string]interface{}
 //	       x2j.Unmarshal([]byte(doc),&s) where s of type string (Overrides xml.Unmarshal().)
 //	       x2j.Unmarshal([]byte(doc),&struct) - passed to xml.Unmarshal()
@@ -626,18 +522,18 @@ func valuesFromKeyPath(m map[string]interface{}, keys []string) []interface{} {
 func Unmarshal(doc []byte, v interface{}) error {
 	switch v.(type) {
 	case *map[string]interface{}:
-		m,err := DocToMap(string(doc))
+		m, err := DocToMap(string(doc))
 		vv := *v.(*map[string]interface{})
-		for k,v := range m {
+		for k, v := range m {
 			vv[k] = v
 		}
 		return err
 	case *string:
-		s,err := DocToJson(string(doc))
+		s, err := DocToJson(string(doc))
 		*(v.(*string)) = s
 		return err
 	default:
-		return xml.Unmarshal(doc,v)
+		return xml.Unmarshal(doc, v)
 	}
 	return nil
 }

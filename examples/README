@@ -1,0 +1,127 @@
+Examples of using ValuesFromTagPath().
+
+A number of interesting examples have shown up in the gonuts discussion group
+that could be handled - after a fashion - using the ValuesFromTagPath() function.
+
+gonuts1.go - 
+
+Here we see that the message stream has a problem with multiple tag spellings,
+though the message structure remains constant.  In this example we 'anonymize'
+the tag with the variant spellings.
+	mm := x2j.ValuesFromTagPath(doc,"data.*)
+	where '*' is any possible spelling - "netid" or "idnet"
+	and the result is a list with 1 member of map[string]interface{} type.
+
+Once we've retrieved the map, we can parse it using the known keys - "disable",
+"text1" and "word1".
+
+
+gonuts2.go - 
+
+This is an interesting case where there was a need to handle messages with lists
+of "ClaimStatusCodeRecord" entries as well as messages with NONE.  (Here we see
+some of the vagaries of dealing with mixed messages that are verging on becoming
+anonymous.) 
+
+	strXml  - the message with two ClaimStatusCodeRecord entries
+	strXmlA - the message with one ClaimStatusCodeRecord entry
+	strXml2 - the message with NO ClaimStatusCodeRecord entries
+
+ValuesFromTagPath() options:
+
+	path == "Envelope.Body.GetClaimStatusCodesResponse.GetClaimStatusCodesResult.ClaimStatusCodeRecord"
+		for doc == strXml:
+		    returns: a list - []interface{} - with two values of map[string]interface{} type
+		for doc == strXmlA:
+		    returns: a list - []interface{} - with one map[string]interface{} type
+		for doc == strXml2:
+		    returns 'nil' - no values
+
+	path == "*.*.*.*.*"
+		for doc == strXml:
+		    returns: a list - []interface{} - with two values of map[string]interface{} type
+	
+	path == "*.*.*.*.*.Description
+		for doc == strXml:
+		    returns: a list - []interface{} - with two values of string type, the individual
+		             values from parsing the two map[string]interface{} values where key=="Description"
+
+	path == "*.*.*.*.*.*"
+		for doc == strXml:
+		    returns: a list - []interface{} - with six values of string type, the individual
+		             values from parsing all keys in the two map[string]interface{} values
+
+IN GENERAL
+
+Think of the wildcard character "*" as anonymizing the tag in the position of the path where
+it occurs. If we have a message that looks like this.
+
+var doc = `
+   <books>
+      <book seq="1">
+         <author>William H. Gaddis</author>
+         <title>The Recognitions</title>
+         <review>One of the great seminal American novels of the 20th century.</review>
+      </book>
+      <book seq="2">
+         <author>Austin Tappan Wright</author>
+         <title>Islandia</title>
+         <review>An example of earlier 20th century American utopian fiction.</review>
+      </book>
+      <book seq="3">
+         <author>John Hawkes</author>
+         <title>The Beetle Leg</title>
+         <review>A lyrical novel about the construction of Ft. Peck Dam in Montana.</review>
+      </book>
+      <book seq="4">
+         <author>T.E. Porter</author>
+         <title>King's Day</title>
+         <review>A magical novella.</review>
+      </book>
+   </books>
+`
+
+path == "books" 
+    return a list with one members, map[string]interface{}, with a single key 'book' and
+           whose value is a list.
+
+path == "books.book"
+    return a list of four members, map[string]interface{} - each map[string]interface{} is
+           a 'book' entry
+
+path == "books.*"
+    return a list of four members, map[string]interface{} - each map[string]interface{} is
+           a 'book' entry [the same as "books.book"]
+
+path == "books.*.title"
+    return a list of four members, interface{} - interface{} is the title of a book in
+           the list of 'books.book' [the same as "books.book.title"]
+
+path == "books.*.*"
+    return a list of twelve members, interface{} - interface{} is the title, author, or review
+    of a book in the list of 'books.book' [the same as "books.book.*"]
+
+
+NOTES.
+
+Attributes.
+
+By default interface{} values do not include attributes; though they do show up in maps.
+So, if you're looking for a particular values based on attribute values, retrieve the entries
+as map[string]interface{} values and parse them based on attribute key values.  (Attribute
+keys are have '-' prepended to their name.)
+
+Lists of entries vs. single entries.
+
+The gonuts2.go example highlights some of the ambiguity that must be managed when dealing with
+XML messages anonymously using the x2j package.
+	- for strXml "ClaimStatusCodeRecord" has a []interface{} value
+	- for strXmlA "ClaimStatusCodeRecord" has a map[string]interface{} value
+
+ValuesFromTagPath() tries to normalize this by returning the []interface{} value as separate
+list members rather than the absolute value in the map representation.  So the same logic
+could be used to parse the entries no matter how many values are returned - other than 'nil'.
+"...ClaimStatusCodeRecord.*" will return all [non-attribute] values without their tags, so it's
+a little hard to know what you've got.  It is recommended that the wildcard - "*" - not be
+used at the end of a path for that very reason.
+

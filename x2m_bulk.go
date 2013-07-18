@@ -1,13 +1,8 @@
-/*	
-	Process files with multiple XML messages.
+// Copyright 2012-2013 Charles Banning. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file
 
-	Architecture:
-		Read file into buffer 
-			-> read message from buffer
-				-> unmarshal to map[string]interface{}
-				-> dispatch to process or error handler
-			-> continue until io.EOF
-*/
+//	x2m_bulk.go: Process files with multiple XML messages.
 package x2j
 
 import (
