@@ -3,7 +3,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*
-	Unmarshal an arbitrary XML doc to a map[string]interface{} or a JSON string.
+	Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
 	x2j.Unmarshal does that by wrapping xml.Unmarshal.
 
 	Intermediate functions that can be useful are:
