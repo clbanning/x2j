@@ -137,7 +137,7 @@ included application-, package-, class- and method-level metrics reported in an 
 	<Value name="" source="" package="" value=""/>
 	<Value name="" source="" package="" value="" inrange=""/>
 
-In addition, most metrics were reported with two different "Metric" compound elements:
+In addition, the metrics were reported with two different "Metric" compound elements:
 	<Metrics>
 		<Metric...>
 			<Values>
