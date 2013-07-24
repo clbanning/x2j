@@ -56,14 +56,14 @@ func main() {
 			fmt.Println("mferr:", mferr.Error())
 			return
 		}
-		fmt.Print(time.Now().String(), " id: ", id, " desc: ", desc, " len(Values): ")
+		fmt.Print(time.Now().String(), " id: ", id, " desc: ", desc)
 		mf.WriteString(id + "," + desc + "\n")
 		for key, val := range aMetricVal {
 			switch key {
 			case "Values":
 				// extract the list of "Value" from map
 				values := val.(map[string]interface{})["Value"].([]interface{})
-				fmt.Println(len(values))
+				fmt.Println(" len(Values):",len(values))
 				var gotKeys bool
 				for _, vval := range values {
 					valueEntry := vval.(map[string]interface{})
@@ -95,7 +95,7 @@ func main() {
 				}
 			case "Value":
 				vv := val.(map[string]interface{})
-				fmt.Println(len(vv))
+				fmt.Println(" len(Value):",len(vv))
 				mf.WriteString("value\n" + vv["-value"].(string) + "\n")
 			}
 		}
