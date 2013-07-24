@@ -139,14 +139,14 @@ included application-, package-, class- and method-level metrics reported in an 
 
 In addition, the metrics were reported with two different "Metric" compound elements:
 	<Metrics>
-		<Metric...>
+		<Metric id="" description="">
 			<Values>
 				<Value.../>
 				...
 			</Values>
 		</Metric>
 		...
-		<Metric...>
+		<Metric id="" description="">
 			<Value.../>
 		</Metric>
 		...
