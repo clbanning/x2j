@@ -125,3 +125,56 @@ could be used to parse the entries no matter how many values are returned - othe
 a little hard to know what you've got.  It is recommended that the wildcard - "*" - not be
 used at the end of a path for that very reason.
 
+
+EAT YOUR OWN DOG FOOD ... 
+
+I needed to convert a large (14.9 MB) XML data set from an Eclipse metrics report on an
+application that had 355,100 lines of code in 211 packages into CSV data sets.  The report
+included application-, package-, class- and method-level metrics reported in an element, 
+"Value", with varying attributes.
+	<Value value=""/>
+	<Value name="" package="" value=""/>
+	<Value name="" source="" package="" value=""/>
+	<Value name="" source="" package="" value="" inrange=""/>
+
+I could have used the Go vernacular by unmarshaling the report into a structure, then 
+sorting through which field had been populated.  Using the x2j package seemed a little more
+straightforward.  I wrote the program getmetrics.go to do this.  
+
+Note that the call to ValuesFromKeyPath()
+
+	metricVals := x2j.ValuesFromKeyPath(m, "Metrics.Metric", true)
+
+requests that attributes be returned by including 'true' as the third argument.  After that
+everything is pretty straight forward. The metrics for processing over 120,000 "Value"
+elements (Intel Core i7, 8 GB, OS X 10.8, Solid State drive) are as follows.
+
+2013-07-24 06:10:43.306254977 -0500 CDT ... File Opened: static_analysis.xml
+2013-07-24 06:10:43.313967874 -0500 CDT ... File Read - size: 14863568
+2013-07-24 06:10:46.936708703 -0500 CDT ... XML Unmarshaled - len: 1
+2013-07-24 06:10:46.936736777 -0500 CDT ... ValuesFromKeyPath -len: 23
+2013-07-24 06:10:46.937687621 -0500 CDT id: VG desc: McCabe Cyclomatic Complexity len(Values): 24562
+2013-07-24 06:10:47.27911057 -0500 CDT id: PAR desc: Number of Parameters len(Values): 24562
+2013-07-24 06:10:47.618649972 -0500 CDT id: NBD desc: Nested Block Depth len(Values): 24562
+2013-07-24 06:10:47.957207348 -0500 CDT id: CA desc: Afferent Coupling len(Values): 211
+2013-07-24 06:10:47.960266602 -0500 CDT id: CE desc: Efferent Coupling len(Values): 211
+2013-07-24 06:10:47.963445548 -0500 CDT id: RMI desc: Instability len(Values): 211
+2013-07-24 06:10:47.966493635 -0500 CDT id: RMA desc: Abstractness len(Values): 211
+2013-07-24 06:10:47.969658668 -0500 CDT id: RMD desc: Normalized Distance len(Values): 211
+2013-07-24 06:10:47.972691271 -0500 CDT id: DIT desc: Depth of Inheritance Tree len(Values): 2074
+2013-07-24 06:10:48.003167479 -0500 CDT id: WMC desc: Weighted methods per Class len(Values): 2074
+2013-07-24 06:10:48.033603803 -0500 CDT id: NSC desc: Number of Children len(Values): 2074
+2013-07-24 06:10:48.063952277 -0500 CDT id: NORM desc: Number of Overridden Methods len(Values): 2074
+2013-07-24 06:10:48.094535034 -0500 CDT id: LCOM desc: Lack of Cohesion of Methods len(Values): 2074
+2013-07-24 06:10:48.125402 -0500 CDT id: NOF desc: Number of Attributes len(Values): 2074
+2013-07-24 06:10:48.155747119 -0500 CDT id: NSF desc: Number of Static Attributes len(Values): 2074
+2013-07-24 06:10:48.186754754 -0500 CDT id: NOM desc: Number of Methods len(Values): 2074
+2013-07-24 06:10:48.216871612 -0500 CDT id: NSM desc: Number of Static Methods len(Values): 2074
+2013-07-24 06:10:48.247056798 -0500 CDT id: SIX desc: Specialization Index len(Values): 2074
+2013-07-24 06:10:48.277398117 -0500 CDT id: NOC desc: Number of Classes len(Values): 211
+2013-07-24 06:10:48.28072463 -0500 CDT id: NOI desc: Number of Interfaces len(Values): 211
+2013-07-24 06:10:48.284044018 -0500 CDT id: NOP desc: Number of Packages len(Values): 1
+2013-07-24 06:10:48.284572887 -0500 CDT id: TLOC desc: Total Lines of Code len(Values): 1
+2013-07-24 06:10:48.28524196 -0500 CDT id: MLOC desc: Method Lines of Code len(Values): 24562
+
+
