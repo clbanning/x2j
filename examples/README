@@ -137,9 +137,23 @@ included application-, package-, class- and method-level metrics reported in an 
 	<Value name="" source="" package="" value=""/>
 	<Value name="" source="" package="" value="" inrange=""/>
 
-I could have used the Go vernacular by unmarshaling the report into a structure, then 
-sorting through which field had been populated.  Using the x2j package seemed a little more
-straightforward.  I wrote the program getmetrics.go to do this.  
+In addition, most metrics were reported with two different "Metric" compound elements:
+	<Metrics>
+		<Metric...>
+			<Values>
+				<Value.../>
+				...
+			</Values>
+		</Metric>
+		...
+		<Metric...>
+			<Value.../>
+		</Metric>
+		...
+	</Metrics>
+
+Using the x2j package seemed a more straightforward approach than using Go vernacular
+and the standard xml package.  I wrote the program getmetrics.go to do this.  
 
 Note that the call to ValuesFromKeyPath()
 
