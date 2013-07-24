@@ -6,8 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"tamgroup/x2j"
 	"time"
+	"github.com/clbanning/x2j"
 )
 
 func main() {
