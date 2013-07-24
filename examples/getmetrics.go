@@ -99,5 +99,6 @@ func main() {
 				mf.WriteString("value\n" + vv["-value"].(string) + "\n")
 			}
 		}
+		mf.Close()
 	}
 }
