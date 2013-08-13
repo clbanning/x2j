@@ -139,7 +139,7 @@ BenchmarkBig3_UseX2j-4         20000    84332         20000    81703      3%
 BenchmarkBig3_UseJson-4       500000     3930        500000     3862      2%
 BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     8427      3%
 
-The x2j package gets an additional 3X% performance boost from Go 1.2+.
+The x2j package gets an additional 3% performance boost from Go 1.2+.
 (Probably due to GC improvements.)
 
                            ----- Go 1.1.1+ ----   --------i-- Go 1.2+ ----------
