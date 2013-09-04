@@ -5,9 +5,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/clbanning/x2j"
 	"os"
 	"time"
-	"github.com/clbanning/x2j"
 )
 
 func main() {
@@ -63,7 +63,7 @@ func main() {
 			case "Values":
 				// extract the list of "Value" from map
 				values := val.(map[string]interface{})["Value"].([]interface{})
-				fmt.Println(" len(Values):",len(values))
+				fmt.Println(" len(Values):", len(values))
 				var gotKeys bool
 				for _, vval := range values {
 					valueEntry := vval.(map[string]interface{})
@@ -74,10 +74,11 @@ func main() {
 						for kk, _ := range valueEntry {
 							if gotFirstKey {
 								mf.WriteString(",")
+							} else {
+								gotFirstKey = true
 							}
 							// strip prepended hyphen
 							mf.WriteString(kk[1:])
-							gotFirstKey = true
 						}
 						mf.WriteString("\n")
 						gotKeys = true
@@ -87,15 +88,16 @@ func main() {
 					for _, vv := range valueEntry {
 						if gotFirstVal {
 							mf.WriteString(",")
+						} else {
+							gotFirstVal = true
 						}
 						mf.WriteString(vv.(string))
-						gotFirstVal = true
 					}
 					mf.WriteString("\n")
 				}
 			case "Value":
 				vv := val.(map[string]interface{})
-				fmt.Println(" len(Value):",len(vv))
+				fmt.Println(" len(Value):", len(vv))
 				mf.WriteString("value\n" + vv["-value"].(string) + "\n")
 			}
 		}
