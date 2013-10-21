@@ -384,8 +384,8 @@ func MapValue(m map[string]interface{}, path string, attr map[string]interface{}
 	var ok bool
 	var okey string
 	var isMap bool = true
-	if keys[0] == "" {
-		goto checkAttr
+	if keys[0] == "" && len(attr) == 0 {
+		return v, nil
 	}
 	for _, key := range keys {
 		if !isMap {
@@ -404,12 +404,6 @@ func MapValue(m map[string]interface{}, path string, attr map[string]interface{}
 		}
 		// save 'key' for error reporting
 		okey = key
-	}
-
-checkAttr:
-	// no attributes to match, then done
-	if len(attr) == 0 {
-		return v, nil
 	}
 
 	// match attributes; value is "#text" or nil
