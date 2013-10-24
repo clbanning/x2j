@@ -111,6 +111,9 @@ So, if you're looking for a particular values based on attribute values, retriev
 as map[string]interface{} values and parse them based on attribute key values.  (Attribute
 keys are have '-' prepended to their name.)
 
+The gonuts3.go example illustrates extracting all attribute values in a doc associated with a 
+specific tag value.
+
 Lists of entries vs. single entries.
 
 The gonuts2.go example highlights some of the ambiguity that must be managed when dealing with
