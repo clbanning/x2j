@@ -3,21 +3,58 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*
-	Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
+   Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
 
-	x2j.Unmarshal wraps xml.Unmarshal.
+   The one really useful function is:
 
-	Intermediate functions that can be useful are:
-		DocToJson() returns the XML as a JSON object of type string.
-		DocToMap() returns an intermediate result with the XML doc unmarshal'd to a map
-		           of type map[string]interface{}. It is analogous to unmarshal'ng a JSON string to
-		           a map using json.Unmarshal(). (This was the original purpose of this library.)
-		DocToTree()/WriteTree() let you examine the parsed XML doc.
+       - Unmarshal(doc []byte, v interface{}) error  
+         where v is a pointer to a variable of type 'map[string]interface{}', 'string', or
+         any other type supported by xml.Unmarshal().
 
-	XML values are all type 'string'. The optional argument 'recast' for DocToJson()
-	and DocToMap() will convert element values to JSON data types - 'float64' and 'bool' -
-	if possible.  This, however, should be done with caution as it will recast ALL numeric
-	and boolean string values, even those that are meant to be of type 'string'.
+   To retrieve a value for specific tag use: 
+
+       - DocValue(doc, path string, attrs ...string) (interface{},error) 
+       - MapValue(m map[string]interface{}, path string, attr map[string]interface{}, recast ...bool) (interface{}, error)
+
+   The 'path' argument is a period-separated tag hierarchy (similar to 'relative variable'
+   syntax in Websphere MQ Broker ESQL programming).  It is the program's responsibility to
+   cast the returned value to the proper type; possible types are the normal JSON 
+   unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
+
+   To retrieve all values associated with a tag occurring anywhere in the XML document use:
+
+       - ValuesForTag(doc, tag string) ([]interface{}, error)
+       - ValuesForKey(m map[string]interface{}, key string) []interface{}
+
+       Demos: http://play.golang.org/p/m8zP-cpk0O
+           http://play.golang.org/p/cIteTS1iSg
+
+   Returned values should be one of map[string]interface, []interface{}, or string.
+
+   All the values assocated with a tag-path that may include one or more wildcard characters - 
+   '*' - can also be retrieved using:
+
+       - ValuesFromTagPath(doc, path string, getAttrs ...bool) ([]interface{}, error)
+       - ValuesFromKeyPath(map[string]interface{}, path string, getAttrs ...bool) []interface{}
+
+       Demos: http://play.golang.org/p/kUQnZ8VuhS
+   	        http://play.golang.org/p/l1aMHYtz7G
+              http://play.golang.org/p/vd8pMiI21b
+
+   NOTE: care should be taken when using "*" at the end of a path - i.e., "books.book.*".  See
+   the x2jpath_test.go case on how the wildcard returns all key values and collapses list values;
+   the same message structure can load a []interface{} or a map[string]interface{} (or an interface{}) 
+   value for a tag.
+
+   See the test cases in "x2jpath_test.go" and programs in "example" subdirectory for more.
+
+   XML PARSING CONVENTIONS
+
+      - Attributes are parsed to map[string]interface{} values by prefixing a hyphen, '-',
+        to the attribute label.
+      - If the element is a simple element and has attributes, the element value
+        is given the key '#text' for its map[string]interface{} representation.  (See
+        the 'atomFeedString.xml' test data, below.)
 */
 package x2j
 

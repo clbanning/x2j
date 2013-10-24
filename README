@@ -56,6 +56,7 @@ All the values assocated with a tag-path that may include one or more wildcard c
 
     Demos: http://play.golang.org/p/kUQnZ8VuhS
 	        http://play.golang.org/p/l1aMHYtz7G
+           http://play.golang.org/p/vd8pMiI21b
 
 NOTE: care should be taken when using "*" at the end of a path - i.e., "books.book.*".  See
 the x2jpath_test.go case on how the wildcard returns all key values and collapses list values;
