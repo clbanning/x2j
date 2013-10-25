@@ -27,7 +27,8 @@
        - ValuesForKey(m map[string]interface{}, key string) []interface{}
 
        Demos: http://play.golang.org/p/m8zP-cpk0O
-           http://play.golang.org/p/cIteTS1iSg
+              http://play.golang.org/p/cIteTS1iSg
+              http://play.golang.org/p/vd8pMiI21b
 
    Returned values should be one of map[string]interface, []interface{}, or string.
 
@@ -39,7 +40,6 @@
 
        Demos: http://play.golang.org/p/kUQnZ8VuhS
    	        http://play.golang.org/p/l1aMHYtz7G
-              http://play.golang.org/p/vd8pMiI21b
 
    NOTE: care should be taken when using "*" at the end of a path - i.e., "books.book.*".  See
    the x2jpath_test.go case on how the wildcard returns all key values and collapses list values;
