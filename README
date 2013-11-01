@@ -56,7 +56,7 @@ All the values assocated with a tag-path that may include one or more wildcard c
     - ValuesFromKeyPath(map[string]interface{}, path string, getAttrs ...bool) []interface{}
 
     Demos: http://play.golang.org/p/kUQnZ8VuhS
-	        http://play.golang.org/p/l1aMHYtz7G
+           http://play.golang.org/p/l1aMHYtz7G
 
 NOTE: care should be taken when using "*" at the end of a path - i.e., "books.book.*".  See
 the x2jpath_test.go case on how the wildcard returns all key values and collapses list values;
@@ -80,7 +80,7 @@ processing. You can use the bulk XML message processor to convert files of XML m
 map[string]interface{} values with custom processing and error handler functions.  See
 the notes and test code for:
 
-	- XmlMsgsFromFile(fname string, phandler func(map[string]interface{}) bool, ehandler func(error) bool,recast ...bool) error
+   - XmlMsgsFromFile(fname string, phandler func(map[string]interface{}) bool, ehandler func(error) bool,recast ...bool) error
 
 IMPLEMENTATION NOTES
 
@@ -103,7 +103,7 @@ USES
    - putting a XML API on our message hub middleware (http://jsonhub.net)
    - loading XML data into NoSQL database, such as, mongoDB
 
-PERFORMANCE IMPROVEMENTS WITH GO 1.1
+PERFORMANCE IMPROVEMENTS WITH GO 1.1 and 1.2
 
 Upgrading to Go 1.1 environment results in performance improvements for XML and JSON
 unmarshalling, in general.  The x2j package gets an average performance boost of 40%.
@@ -123,38 +123,22 @@ BenchmarkBig3_UseX2j-4         10000   147407         20000    84332     43%
 BenchmarkBig3_UseJson-4       500000     5921        500000     3930     34%
 BenchmarkBig3_UseJsonToMap-4  200000    13037        200000     8670     33%
 
-The x2j package gets an additional 3% performance boost from Go 1.1.1.
+The x2j package gets an additional 15-20% performance boost going to Go 1.2.
 
-                           ------ Go 1.1 ------   --------- Go 1.1.1+ ----------
+                           ------ Go 1.1 ------   ----------- Go 1.2 -----------
                             iterations  ns/op      iterations  ns/op  % improved
-Benchmark_UseXml-4            200000    10377        200000    10152      2%
-Benchmark_UseX2j-4             50000    33958         50000    33232      2%
-Benchmark_UseJson-4          1000000     1484       1000000     1466      1%
-Benchmark_UseJsonToMap-4     1000000     1566       1000000     1550      1%
-BenchmarkBig_UseXml-4         100000    15876        100000    15551      2%
-BenchmarkBig_UseX2j-4          50000    52661         50000    51227      3%
-BenchmarkBig_UseJson-4       1000000     2664       1000000     2591      3%
-BenchmarkBig_UseJsonToMap-4   500000     5753        500000     5593      3%
-BenchmarkBig3_UseXml-4        100000    24686        100000    23780      4%
-BenchmarkBig3_UseX2j-4         20000    84332         20000    81703      3%
-BenchmarkBig3_UseJson-4       500000     3930        500000     3862      2%
-BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     8427      3%
+Benchmark_UseXml-4            200000    10377        200000    11031     -6%
+Benchmark_UseX2j-4             50000    33958        100000    29188     14%
+Benchmark_UseJson-4          1000000     1484       1000000     1347      9%
+Benchmark_UseJsonToMap-4     1000000     1566       1000000     1434      8%
+BenchmarkBig_UseXml-4         100000    15876        100000    16585     -4%
+BenchmarkBig_UseX2j-4          50000    52661         50000    43452     17%
+BenchmarkBig_UseJson-4       1000000     2664       1000000     2523      5%
+BenchmarkBig_UseJsonToMap-4   500000     5753        500000     4992     13%
+BenchmarkBig3_UseXml-4        100000    24686        100000    24348      1%
+BenchmarkBig3_UseX2j-4         20000    84332         50000    66736     21%
+BenchmarkBig3_UseJson-4       500000     3930        500000     3733      5%
+BenchmarkBig3_UseJsonToMap-4  200000     8670        200000     7810     10%
 
-The x2j package gets an additional 3% performance boost from Go 1.1.2+.
-(Probably due to GC improvements.)
 
-                           ----- Go 1.1.1+ ----   ---------- Go 1.1.2+ ---------
-                            iterations  ns/op      iterations  ns/op  % improved
-Benchmark_UseXml-4            200000    10152        200000    10366     -2%
-Benchmark_UseX2j-4             50000    33232         50000    32376      3%
-Benchmark_UseJson-4          1000000     1466       1000000     1319     10%
-Benchmark_UseJsonToMap-4     1000000     1550       1000000     1400     10%
-BenchmarkBig_UseXml-4         100000    15551        100000    15886     -2%
-BenchmarkBig_UseX2j-4          50000    51227         50000    49653      3%
-BenchmarkBig_UseJson-4       1000000     2591       1000000     2704     -4%
-BenchmarkBig_UseJsonToMap-4   500000     5593        500000     5641     -1%
-BenchmarkBig3_UseXml-4        100000    23780        100000    24060     -1%
-BenchmarkBig3_UseX2j-4         20000    81703         20000    79117      3%
-BenchmarkBig3_UseJson-4       500000     3862        500000     3931     -2%
-BenchmarkBig3_UseJsonToMap-4  200000     8427        200000     8404      0%
 
