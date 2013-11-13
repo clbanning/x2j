@@ -377,7 +377,7 @@ func WriteMap(m interface{}, offset ...int) string {
 // DocValue - return a value for a specific tag
 //	'doc' is a valid XML message.
 //	'path' is a hierarchy of XML tags, e.g., "doc.name".
-//	'attrs' is an optional list of "name:value" pairs for attributes.
+//	'attrs' is an OPTIONAL list of "name:value" pairs for attributes.
 //	Note: 'recast' is not enabled here. Use DocToMap(), NewAttributeMap(), and MapValue() calls for that.
 func DocValue(doc, path string, attrs ...string) (interface{}, error) {
 	n, err := DocToTree(doc)
@@ -402,7 +402,7 @@ func DocValue(doc, path string, attrs ...string) (interface{}, error) {
 // MapValue - retrieves value based on walking the map, 'm'.
 //	'm' is the map value of interest.
 //	'path' is a period-separated hierarchy of keys in the map.
-//	'attr' is a map of attribute "name:value" pairs from NewAttributeMap().
+//	'attr' is a map of attribute "name:value" pairs from NewAttributeMap().  May be 'nil'.
 //	If the path can't be traversed, an error is returned.
 //	Note: the optional argument 'r' can be used to coerce attribute values, 'attr', if done so for 'm'.
 func MapValue(m map[string]interface{}, path string, attr map[string]interface{}, r ...bool) (interface{}, error) {
@@ -444,6 +444,9 @@ func MapValue(m map[string]interface{}, path string, attr map[string]interface{}
 	}
 
 	// match attributes; value is "#text" or nil
+	if attr == nil {
+		return v, nil
+	}
 	return hasAttributes(v, attr)
 }
 
@@ -482,6 +485,9 @@ func hasAttributes(v interface{}, a map[string]interface{}) (interface{}, error)
 // NewAttributeMap() - generate map of attributes=value entries as map["-"+string]string.
 //	'kv' arguments are "name:value" pairs that appear as attributes, name="value".
 func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
+	if len(kv) == 0 {
+		return nil, nil
+	}
 	m := make(map[string]interface{}, 0)
 	for _, v := range kv {
 		vv := strings.Split(v, ":")

@@ -23,3 +23,15 @@ func TestUnmarshal(t *testing.T) {
 	}
 	fmt.Println("s:",s)
 }
+
+
+func TestMapValue(t *testing.T) {
+	var doc = `<doc> <name>Mayer Hawthorne</name> <song> <title>A Long Time</title> <verse no="1"> <line no="1">Henry was a renegade</line> <line no="2">Didn't like to play it straight</line> </verse> </song> </doc>`
+
+	fmt.Println("\nTestMapValue of doc.song.verse w/ len(attrs) == 0.")
+	v,err := DocValue(doc,"doc.song.verse")
+	if err != nil {
+		fmt.Println("err:",err.Error())
+	}
+	fmt.Println("result:",v)
+}
