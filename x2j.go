@@ -483,6 +483,7 @@ func hasAttributes(v interface{}, a map[string]interface{}) (interface{}, error)
 
 // NewAttributeMap() - generate map of attributes=value entries as map["-"+string]string.
 //	'kv' arguments are "name:value" pairs that appear as attributes, name="value".
+//	If len(kv) == 0, the return is (nil, nil).
 func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
 	if len(kv) == 0 {
 		return nil, nil
