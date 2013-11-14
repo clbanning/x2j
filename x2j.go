@@ -16,10 +16,9 @@
        - DocValue(doc, path string, attrs ...string) (interface{},error) 
        - MapValue(m map[string]interface{}, path string, attr map[string]interface{}, recast ...bool) (interface{}, error)
 
-   The 'path' argument is a period-separated tag hierarchy (similar to 'relative variable'
-   syntax in Websphere MQ Broker ESQL programming).  It is the program's responsibility to
-   cast the returned value to the proper type; possible types are the normal JSON 
-   unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
+   The 'path' argument is a period-separated tag hierarchy - also known as dot-notation.
+   It is the program's responsibility to cast the returned value to the proper type; possible 
+   types are the normal JSON unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
 
    To retrieve all values associated with a tag occurring anywhere in the XML document use:
 
