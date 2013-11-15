@@ -5,7 +5,7 @@
 /*
    Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
-   One really useful function is:
+   One useful function is:
 
        - Unmarshal(doc []byte, v interface{}) error  
          where v is a pointer to a variable of type 'map[string]interface{}', 'string', or
@@ -560,14 +560,14 @@ func hasKey(iv interface{}, key string, ret *[]interface{}) {
 func Unmarshal(doc []byte, v interface{}) error {
 	switch v.(type) {
 	case *map[string]interface{}:
-		m, err := DocToMap(string(doc))
+		m, err := ByteDocToMap(doc)
 		vv := *v.(*map[string]interface{})
 		for k, v := range m {
 			vv[k] = v
 		}
 		return err
 	case *string:
-		s, err := DocToJson(string(doc))
+		s, err := ByteDocToJson(doc)
 		*(v.(*string)) = s
 		return err
 	default:
@@ -575,3 +575,62 @@ func Unmarshal(doc []byte, v interface{}) error {
 	}
 	return nil
 }
+
+// ByteDocToJson - return an XML doc as a JSON string.
+//	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
+func ByteDocToJson(doc []byte, recast ...bool) (string, error) {
+	var r bool
+	if len(recast) == 1 {
+		r = recast[0]
+	}
+	m, merr := ByteDocToMap(doc, r)
+	if m == nil || merr != nil {
+		return "", merr
+	}
+
+	b, berr := json.Marshal(m)
+	if berr != nil {
+		return "", berr
+	}
+
+	// NOTE: don't have to worry about safe JSON marshaling with json.Marshal, since '<' and '>" are reservedin XML.
+	return string(b), nil
+}
+
+// ByteDocToMap - convert an XML doc into a map[string]interface{}.
+// (This is analogous to unmarshalling a JSON string to map[string]interface{} using json.Unmarshal().)
+//	If the optional argument 'recast' is 'true', then values will be converted to boolean or float64 if possible.
+//	Note: recasting is only applied to element values, not attribute values.
+func ByteDocToMap(doc []byte, recast ...bool) (map[string]interface{}, error) {
+	var r bool
+	if len(recast) == 1 {
+		r = recast[0]
+	}
+	n, err := ByteDocToTree(doc)
+	if err != nil {
+		return nil, err
+	}
+
+	m := make(map[string]interface{})
+	m[n.key] = n.treeToMap(r)
+
+	return m, nil
+}
+
+// ByteDocToTree - convert an XML doc into a tree of nodes.
+func ByteDocToTree(doc []byte) (*Node, error) {
+	// xml.Decoder doesn't properly handle whitespace in some doc
+	// see songTextString.xml test case ...
+	reg, _ := regexp.Compile("[ \t\n\r]*<")
+	doc = reg.ReplaceAll(doc, []byte("<"))
+
+	b := bytes.NewBuffer(doc)
+	p := xml.NewDecoder(b)
+	n, berr := xmlToTree("", nil, p)
+	if berr != nil {
+		return nil, berr
+	}
+
+	return n, nil
+}
+
