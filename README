@@ -1,5 +1,4 @@
-x2j.go - A utility library for Unmarshal'ing XML docs into a map or a JSON string.
-         clbanning@gmail.com
+x2j.go - Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
 MOTIVATION
 

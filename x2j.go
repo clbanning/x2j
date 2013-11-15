@@ -1,11 +1,11 @@
-//	Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
+//	Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 // Copyright 2012-2013 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*
-   Unmarshal an arbitrary XML message and extract values (using wildcards, if necessary).
+   Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
-   The one really useful function is:
+   One really useful function is:
 
        - Unmarshal(doc []byte, v interface{}) error  
          where v is a pointer to a variable of type 'map[string]interface{}', 'string', or
