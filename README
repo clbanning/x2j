@@ -1,5 +1,11 @@
 x2j.go - Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
+ANNOUNCEMENT - 2 December 2013
+
+For symmetry, the package j2x has functions that marshal JSON strings and
+map[string]interface{} values to XML encoded strings: 
+                                         http://godoc.org/github.com/clbanning/j2x.
+
 MOTIVATION
 
 I make extensive use of JSON for messaging and typically unmarshal the messages into
@@ -17,11 +23,6 @@ a couple of small functions to fill this gap.
 Of course, once the XML doc was unmarshal'd into a map[string]interface{} variable it
 was just a matter of calling json.Marshal() to provide it as a JSON string.  Hence 'x2j'
 rather than just 'x2m'.
-
-ANNOUNCEMENT - 2 December 2013
-
-For symmetry, the package j2x has functions that marshal JSON strings and map[string]interface{}
-values to XML encoded strings: http://godoc.org/github.com/clbanning/j2x.
 
 USAGE
 
