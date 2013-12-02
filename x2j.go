@@ -319,7 +319,7 @@ func recast(s string, r bool) interface{} {
 //	'offset' is initial indentation count; typically: WriteMap(m).
 //	NOTE: with XML all element types are 'string'.
 //	But code written as generic for use with maps[string]interface{} values from json.Unmarshal().
-//	Or it can handle a DocToMap(doc,true) result where values have be recast'd.
+//	Or it can handle a DocToMap(doc,true) result where values have been recast'd.
 func WriteMap(m interface{}, offset ...int) string {
 	var indent int
 	if len(offset) == 1 {
