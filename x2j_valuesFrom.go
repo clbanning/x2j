@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 
-//	Extract values from an arbitrary XML doc. Tag path can include wildcard characters.
+//	x2j_valuesFrom.go: Extract values from an arbitrary XML doc. Tag path can include wildcard characters.
 package x2j
 
 import (
@@ -42,7 +42,7 @@ func ValuesFromTagPath(doc, path string, getAttrs ...bool) ([]interface{}, error
 //   'path' is a dot-separated path of key values
 //   'getAttrs' can be set 'true' to return attribute values for "*"-terminated path
 //          If a node is '*', then everything beyond is walked.
-//          E.g., see ValuesForTagPath documentation.
+//          E.g., see ValuesFromTagPath documentation.
 func ValuesFromKeyPath(m map[string]interface{}, path string, getAttrs ...bool) []interface{} {
 	var a bool
 	if len(getAttrs) == 1 {
