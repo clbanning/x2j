@@ -54,6 +54,11 @@
       - If the element is a simple element and has attributes, the element value
         is given the key '#text' for its map[string]interface{} representation.  (See
         the 'atomFeedString.xml' test data, below.)
+
+    io.Reader HANDLING
+
+    ToTree(), ToMap(), ToJson(), and ToJsonIndent() provide parsing of messages from an io.Reader.
+    If you want to handle a message stream, look at XmlMsgsFromReader().
 */
 package x2j
 

@@ -48,3 +48,19 @@ func TestToJsonIndent(t *testing.T) {
 	fmt.Println("json:",s)
 }
 
+func TestBulkParser(t *testing.T) {
+	s := doc + `<this><is>an</err>`+ doc
+	fmt.Println("\nBulkParser (with error) - Read doc:",s)
+	rdr := bytes.NewBufferString(s)
+	XmlMsgsFromReader(rdr,phandler,ehandler)
+}
+
+func phandler(m map[string]interface{}) bool {
+	fmt.Println("phandler m:",m)
+	return true
+}
+
+func ehandler(err error) bool {
+	fmt.Println("ehandler err:",err.Error())
+	return true
+}

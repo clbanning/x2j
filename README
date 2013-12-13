@@ -7,6 +7,8 @@ map[string]interface{} values to XML encoded strings: http://godoc.org/github.co
 
 Also, ToTree(), ToMap(), ToJson(), ToJsonIndent(), ReaderValuesFromTagPath() and ReaderValuesForTag() use io.Reader instead of string or []byte.
 
+If you want to process a stream of XML messages check out XmlMsgsFromReader().
+
 MOTIVATION
 
 I make extensive use of JSON for messaging and typically unmarshal the messages into

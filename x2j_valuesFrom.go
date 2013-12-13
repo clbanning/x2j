@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file
 
 //	x2j_valuesFrom.go: Extract values from an arbitrary XML doc. Tag path can include wildcard characters.
+
 package x2j
 
 import (

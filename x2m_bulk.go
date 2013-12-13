@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file
 
 //	x2m_bulk.go: Process files with multiple XML messages.
+
 package x2j
 
 import (
@@ -12,6 +13,7 @@ import (
 	"io"
 	"os"
 	"regexp"
+	"sync"
 )
 
 // XmlMsgsFromFile()
@@ -104,6 +106,7 @@ type XmlBuffer struct {
 	str *string
 	buf *bytes.Buffer
 }
+var mtx sync.Mutex
 var cnt uint64
 var activeXmlBufs = make(map[uint64]*XmlBuffer)
 
@@ -116,15 +119,19 @@ func NewXmlBuffer(s string) *XmlBuffer {
 	s = reg.ReplaceAllString(s,"<")
 	b := bytes.NewBufferString(s)
 	buf := new(XmlBuffer)
-	buf.cnt = cnt ; cnt++
 	buf.str = &s
 	buf.buf = b
+	mtx.Lock()
+	defer mtx.Unlock()
+	buf.cnt = cnt ; cnt++
 	activeXmlBufs[buf.cnt] = buf
 	return buf
 }
 
 // Close() - release the buffer address for garbage collection
 func (b *XmlBuffer)Close() {
+	mtx.Lock()
+	defer mtx.Unlock()
 	delete(activeXmlBufs,b.cnt)
 }
 
@@ -140,3 +147,38 @@ func (b *XmlBuffer)NextMap(recast ...bool) (map[string]interface{}, error) {
 		}
 		return XmlBufferToMap(b.buf,r)
 }
+
+
+// =============================  io.Reader version for stream processing  ======================
+
+// XmlMsgsFromReader() - io.Reader version of XmlMsgsFromFile
+//	'rdr' is an io.Reader for an XML message (stream)
+//	'phandler' is the map processing handler. Return of 'false' stops further processing.
+//	'ehandler' is the parsing error handler. Return of 'false' stops further processing.
+//	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
+//	      This means that you can stop reading the file on error or after processing a particular message.
+//	      To have reading and handling run concurrently, pass arguments to a go routine in handler and return true.
+func XmlMsgsFromReader(rdr io.Reader, phandler func(map[string]interface{})(bool), ehandler func(error)(bool), recast ...bool) {
+	var r bool
+	if len(recast) == 1 {
+		r = recast[0]
+	}
+
+	for {
+		m, merr := ToMap(rdr,r)
+		if merr != nil && merr != io.EOF {
+			if ok := ehandler(merr); !ok {
+				break
+			 }
+		}
+		if m != nil {
+			if ok := phandler(m); !ok {
+				break
+			}
+		}
+		if merr == io.EOF {
+			break
+		}
+	}
+}
+
