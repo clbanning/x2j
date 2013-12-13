@@ -1,10 +1,11 @@
 x2j.go - Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
-ANNOUNCEMENT - 2 December 2013
+ANNOUNCEMENT - 12 December 2013
 
 For symmetry, the package j2x has functions that marshal JSON strings and
-map[string]interface{} values to XML encoded strings: 
-                                         http://godoc.org/github.com/clbanning/j2x.
+map[string]interface{} values to XML encoded strings: http://godoc.org/github.com/clbanning/j2x.
+
+Also, ToTree(), ToMap(), ToJson(), ToJsonIndent() use io.Reader instead of string or []byte.
 
 MOTIVATION
 
