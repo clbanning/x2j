@@ -76,3 +76,29 @@ func ToJsonIndent(rdr io.Reader, recast ...bool) (string, error) {
 	return string(b), nil
 }
 
+
+// ReaderValuesFromTagPath - io.Reader version of ValuesFromTagPath()
+func ReaderValuesFromTagPath(rdr io.Reader, path string, getAttrs ...bool) ([]interface{}, error) {
+	var a bool
+	if len(getAttrs) == 1 {
+		a = getAttrs[0]
+	}
+	m, err := ToMap(rdr)
+	if err != nil {
+		return nil, err
+	}
+
+	return ValuesFromKeyPath(m, path, a), nil
+}
+
+// ReaderValuesForTag - io.Reader version of ValuesForTag()
+func ReaderValuesForTag(rdr io.Reader, tag string) ([]interface{}, error) {
+	m, err := ToMap(rdr)
+	if err != nil {
+		return nil, err
+	}
+
+	return ValuesForKey(m, tag), nil
+}
+
+
