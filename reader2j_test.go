@@ -52,7 +52,10 @@ func TestBulkParser(t *testing.T) {
 	s := doc + `<this><is>an</err>`+ doc
 	fmt.Println("\nBulkParser (with error) - Read doc:",s)
 	rdr := bytes.NewBufferString(s)
-	XmlMsgsFromReader(rdr,phandler,ehandler)
+	err := XmlMsgsFromReader(rdr,phandler,ehandler)
+	if err != nil {
+		fmt.Println("reader terminated:",err.Error())
+	}
 }
 
 func phandler(m map[string]interface{}) bool {

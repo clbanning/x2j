@@ -54,7 +54,8 @@ func XmlMsgsFromFile(fname string, phandler func(map[string]interface{})(bool), 
 		m, merr := XmlBufferToMap(b,r)
 		if merr != nil && merr != io.EOF {
 			if ok := ehandler(merr); !ok {
-				break
+				// caused reader termination
+				return merr
 			 }
 		}
 		if m != nil {
@@ -158,7 +159,7 @@ func (b *XmlBuffer)NextMap(recast ...bool) (map[string]interface{}, error) {
 //	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass arguments to a go routine in handler and return true.
-func XmlMsgsFromReader(rdr io.Reader, phandler func(map[string]interface{})(bool), ehandler func(error)(bool), recast ...bool) {
+func XmlMsgsFromReader(rdr io.Reader, phandler func(map[string]interface{})(bool), ehandler func(error)(bool), recast ...bool) error {
 	var r bool
 	if len(recast) == 1 {
 		r = recast[0]
@@ -168,7 +169,8 @@ func XmlMsgsFromReader(rdr io.Reader, phandler func(map[string]interface{})(bool
 		m, merr := ToMap(rdr,r)
 		if merr != nil && merr != io.EOF {
 			if ok := ehandler(merr); !ok {
-				break
+				// caused reader termination
+				return merr
 			 }
 		}
 		if m != nil {
@@ -180,5 +182,6 @@ func XmlMsgsFromReader(rdr io.Reader, phandler func(map[string]interface{})(bool
 			break
 		}
 	}
+	return nil
 }
 
