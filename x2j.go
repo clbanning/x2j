@@ -507,13 +507,10 @@ func NewAttributeMap(kv ...string) (map[string]interface{}, error) {
 //	If there is an error encounted while parsing doc, that is returned.
 //	If you want values 'recast' use DocToMap() and ValuesForKey().
 func ValuesForTag(doc, tag string) ([]interface{}, error) {
-	n, err := DocToTree(doc)
+	m, err := DocToMap(doc)
 	if err != nil {
 		return nil, err
 	}
-
-	m := make(map[string]interface{})
-	m[n.key] = n.treeToMap(false)
 
 	return ValuesForKey(m, tag), nil
 }

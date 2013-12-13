@@ -317,7 +317,7 @@ func TestBulk(t *testing.T) {
 }
 
 func TestBulkBuffer(t *testing.T) {
-	fmt.Println("\nTest arbitrary XML buffer")
+	fmt.Println("\nTest arbitrary XML buffer with no ending rootTag - then read from closed buffer.")
 	doc := `<doc><tag /></doc><doc><one att="1">my test doc</one></doc><doc><tag>missing end element</tag>`
 	b := NewXmlBuffer(doc)
 	for {
