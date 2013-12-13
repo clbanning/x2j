@@ -19,7 +19,7 @@ import (
 // XmlMsgsFromFile()
 //	'fname' is name of file
 //	'phandler' is the map processing handler. Return of 'false' stops further processing.
-//	'ehandler' is the parsing error handler. Return of 'false' stops further processing.
+//	'ehandler' is the parsing error handler. Return of 'false' stops further processing and returns error.
 //	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass arguments to a go routine in handler and return true.
@@ -155,7 +155,7 @@ func (b *XmlBuffer)NextMap(recast ...bool) (map[string]interface{}, error) {
 // XmlMsgsFromReader() - io.Reader version of XmlMsgsFromFile
 //	'rdr' is an io.Reader for an XML message (stream)
 //	'phandler' is the map processing handler. Return of 'false' stops further processing.
-//	'ehandler' is the parsing error handler. Return of 'false' stops further processing.
+//	'ehandler' is the parsing error handler. Return of 'false' stops further processing and returns error.
 //	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
 //	      To have reading and handling run concurrently, pass arguments to a go routine in handler and return true.
