@@ -129,24 +129,37 @@ func NewXmlBuffer(s string) *XmlBuffer {
 	return buf
 }
 
-// Close() - release the buffer address for garbage collection
-func (b *XmlBuffer)Close() {
+// BytesNewXmlBuffer() - creates a bytes.Buffer from b with possibly multiple messages
+//	Use Close() function to release the buffer for garbage collection.
+func BytesNewXmlBuffer(b []byte) *XmlBuffer {
+	bb := bytes.NewBuffer(b)
+	buf := new(XmlBuffer)
+	buf.buf = bb
 	mtx.Lock()
 	defer mtx.Unlock()
-	delete(activeXmlBufs,b.cnt)
+	buf.cnt = cnt ; cnt++
+	activeXmlBufs[buf.cnt] = buf
+	return buf
+}
+
+// Close() - release the buffer address for garbage collection
+func (buf *XmlBuffer)Close() {
+	mtx.Lock()
+	defer mtx.Unlock()
+	delete(activeXmlBufs,buf.cnt)
 }
 
 // NextMap() - retrieve next XML message in buffer as a map[string]interface{} value.
 //	The optional argument 'recast' will try and coerce values to float64 or bool as appropriate.
-func (b *XmlBuffer)NextMap(recast ...bool) (map[string]interface{}, error) {
+func (buf *XmlBuffer)NextMap(recast ...bool) (map[string]interface{}, error) {
 		var r bool
 		if len(recast) == 1 {
 			r = recast[0]
 		}
-		if _, ok := activeXmlBufs[b.cnt]; !ok {
+		if _, ok := activeXmlBufs[buf.cnt]; !ok {
 			return nil, errors.New("Buffer is not active.")
 		}
-		return XmlBufferToMap(b.buf,r)
+		return XmlBufferToMap(buf.buf,r)
 }
 
 

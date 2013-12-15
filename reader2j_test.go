@@ -67,3 +67,19 @@ func ehandler(err error) bool {
 	fmt.Println("ehandler err:",err.Error())
 	return true
 }
+
+func TestBulkParserToJson(t *testing.T) {
+	s := doc + `<this><is>an</err>`+ doc
+	fmt.Println("\nBulkParser (with error) - Read doc:",s)
+	rdr := bytes.NewBufferString(s)
+	err := XmlMsgsFromReaderAsJson(rdr,phandlerj,ehandler)
+	if err != nil {
+		fmt.Println("reader terminated:",err.Error())
+	}
+}
+
+func phandlerj(s string) bool {
+	fmt.Println("phandlerj s:",s)
+	return true
+}
+
