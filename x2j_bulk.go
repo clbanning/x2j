@@ -92,9 +92,9 @@ func XmlBufferToJson(b *bytes.Buffer,recast ...bool) (string,error) {
 
 // =============================  io.Reader version for stream processing  ======================
 
-// XmlMsgsFromReader() - io.Reader version of XmlMsgsFromFile
+// XmlMsgsFromReaderAsJson() - io.Reader version of XmlMsgsFromFileAsJson
 //	'rdr' is an io.Reader for an XML message (stream)
-//	'phandler' is the map processing handler. Return of 'false' stops further processing.
+//	'phandler' is the JSON string processing handler. Return of 'false' stops further processing.
 //	'ehandler' is the parsing error handler. Return of 'false' stops further processing and returns error.
 //	Note: phandler() and ehandler() calls are blocking, so reading and processing of messages is serialized.
 //	      This means that you can stop reading the file on error or after processing a particular message.
