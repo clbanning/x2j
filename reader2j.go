@@ -12,6 +12,7 @@ import (
 // ToTree() - parse a XML io.Reader to a tree of Nodes
 func ToTree(rdr io.Reader) (*Node, error) {
 	p := xml.NewDecoder(rdr)
+	p.CharsetReader = X2jCharsetReader
 	n, perr := xmlToTree("", nil, p)
 	if perr != nil {
 		return nil, perr

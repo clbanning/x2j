@@ -59,6 +59,10 @@
 
     ToTree(), ToMap(), ToJson(), and ToJsonIndent() provide parsing of messages from an io.Reader.
     If you want to handle a message stream, look at XmlMsgsFromReader().
+
+    NON-UTF8 CHARACTER SETS
+
+    Use the X2jCharsetReader variable to assign handle alternative character sets.
 */
 package x2j
 
@@ -68,10 +72,18 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"strconv"
 	"strings"
 )
+
+// If X2jCharsetReader != nil, it will be used to decode the doc or stream
+//   import charset "code.google.com/p/go-charset/charset"
+//   ...
+//   x2j.X2jCharsetReader = charset.NewReader
+//   s, err := x2j.DocToJson(doc)
+var X2jCharsetReader func(charset string, input io.Reader)(io.Reader, error)
 
 type Node struct {
 	dup   bool   // is member of a list
@@ -153,6 +165,7 @@ func DocToTree(doc string) (*Node, error) {
 
 	b := bytes.NewBufferString(doc)
 	p := xml.NewDecoder(b)
+	p.CharsetReader = X2jCharsetReader
 	n, berr := xmlToTree("", nil, p)
 	if berr != nil {
 		return nil, berr
@@ -573,7 +586,11 @@ func Unmarshal(doc []byte, v interface{}) error {
 		*(v.(*string)) = s
 		return err
 	default:
-		return xml.Unmarshal(doc, v)
+		b := bytes.NewBuffer(doc)
+		p := xml.NewDecoder(b)
+		p.CharsetReader = X2jCharsetReader
+		return p.Decode(v)
+		// return xml.Unmarshal(doc, v)
 	}
 	return nil
 }
@@ -628,6 +645,7 @@ func ByteDocToTree(doc []byte) (*Node, error) {
 
 	b := bytes.NewBuffer(doc)
 	p := xml.NewDecoder(b)
+	p.CharsetReader = X2jCharsetReader
 	n, berr := xmlToTree("", nil, p)
 	if berr != nil {
 		return nil, berr

@@ -93,6 +93,7 @@ func XmlBufferToMap(b *bytes.Buffer,recast ...bool) (map[string]interface{},erro
 // BufferToTree - derived from DocToTree()
 func XmlBufferToTree(b *bytes.Buffer) (*Node, error) {
 	p := xml.NewDecoder(b)
+	p.CharsetReader = X2jCharsetReader
 	n, berr := xmlToTree("",nil,p)
 	if berr != nil {
 		return nil, berr
