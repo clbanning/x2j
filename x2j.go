@@ -7,18 +7,18 @@
 
    One useful function is:
 
-       - Unmarshal(doc []byte, v interface{}) error  
+       - Unmarshal(doc []byte, v interface{}) error
          where v is a pointer to a variable of type 'map[string]interface{}', 'string', or
          any other type supported by xml.Unmarshal().
 
-   To retrieve a value for specific tag use: 
+   To retrieve a value for specific tag use:
 
-       - DocValue(doc, path string, attrs ...string) (interface{},error) 
+       - DocValue(doc, path string, attrs ...string) (interface{},error)
        - MapValue(m map[string]interface{}, path string, attr map[string]interface{}, recast ...bool) (interface{}, error)
 
    The 'path' argument is a period-separated tag hierarchy - also known as dot-notation.
-   It is the program's responsibility to cast the returned value to the proper type; possible 
-   types are the normal JSON unmarshaling types: string, float64, bool, []interface, map[string]interface{}.  
+   It is the program's responsibility to cast the returned value to the proper type; possible
+   types are the normal JSON unmarshaling types: string, float64, bool, []interface, map[string]interface{}.
 
    To retrieve all values associated with a tag occurring anywhere in the XML document use:
 
@@ -31,7 +31,7 @@
 
    Returned values should be one of map[string]interface, []interface{}, or string.
 
-   All the values assocated with a tag-path that may include one or more wildcard characters - 
+   All the values assocated with a tag-path that may include one or more wildcard characters -
    '*' - can also be retrieved using:
 
        - ValuesFromTagPath(doc, path string, getAttrs ...bool) ([]interface{}, error)
@@ -42,7 +42,7 @@
 
    NOTE: care should be taken when using "*" at the end of a path - i.e., "books.book.*".  See
    the x2jpath_test.go case on how the wildcard returns all key values and collapses list values;
-   the same message structure can load a []interface{} or a map[string]interface{} (or an interface{}) 
+   the same message structure can load a []interface{} or a map[string]interface{} (or an interface{})
    value for a tag.
 
    See the test cases in "x2jpath_test.go" and programs in "example" subdirectory for more.
@@ -68,6 +68,7 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io"
 	"regexp"
 	"strconv"
 	"strings"
@@ -79,6 +80,69 @@ type Node struct {
 	key   string // XML tag
 	val   string // element value
 	nodes []*Node
+}
+
+type CharsetISO88591er struct {
+	r   io.ByteReader
+	buf *bytes.Buffer
+}
+
+func newCharsetISO88591(r io.Reader) *CharsetISO88591er {
+	buf := bytes.Buffer{}
+	return &CharsetISO88591er{r.(io.ByteReader), &buf}
+}
+
+func (cs *CharsetISO88591er) Read(p []byte) (n int, err error) {
+	for _ = range p {
+		if r, err := cs.r.ReadByte(); err != nil {
+			break
+		} else {
+			cs.buf.WriteRune(rune(r))
+		}
+	}
+
+	return cs.buf.Read(p)
+}
+
+func isCharset(charset string, names []string) bool {
+	charset = strings.ToLower(charset)
+
+	for _, n := range names {
+		if charset == strings.ToLower(n) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isCharsetISO88591(charset string) bool {
+	// http://www.iana.org/assignments/character-sets
+	// (last updated 2010-11-04)
+	names := []string{
+		// Name
+		"ISO_8859-1:1987",
+		// Alias (preferred MIME name)
+		"ISO-8859-1",
+		// Aliases
+		"iso-ir-100",
+		"ISO_8859-1",
+		"latin1",
+		"l1",
+		"IBM819",
+		"CP819",
+		"csISOLatin1",
+	}
+
+	return isCharset(charset, names)
+}
+
+func charsetReader(charset string, input io.Reader) (io.Reader, error) {
+	if isCharsetISO88591(charset) {
+		return newCharsetISO88591(input), nil
+	}
+
+	return input, nil
 }
 
 // DocToJson - return an XML doc as a JSON string.
@@ -153,6 +217,7 @@ func DocToTree(doc string) (*Node, error) {
 
 	b := bytes.NewBufferString(doc)
 	p := xml.NewDecoder(b)
+	p.CharsetReader = charsetReader
 	n, berr := xmlToTree("", nil, p)
 	if berr != nil {
 		return nil, berr
@@ -635,4 +700,3 @@ func ByteDocToTree(doc []byte) (*Node, error) {
 
 	return n, nil
 }
-
