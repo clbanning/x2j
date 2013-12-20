@@ -62,7 +62,7 @@
 
     NON-UTF8 CHARACTER SETS
 
-    Use the X2jCharsetReader variable to assign handle alternative character sets.
+    Use the X2jCharsetReader variable to assign io.Reader for alternative character sets.
 */
 package x2j
 
