@@ -78,7 +78,7 @@ import (
 	"strings"
 )
 
-// If X2jCharsetReader != nil, it will be used to decode the doc or stream
+// If X2jCharsetReader != nil, it will be used to decode the doc or stream if required
 //   import charset "code.google.com/p/go-charset/charset"
 //   ...
 //   x2j.X2jCharsetReader = charset.NewReader
