@@ -1,4 +1,4 @@
-//	Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
+//	Unmarshal arbitrary XML docs to map[string]interface{} or JSON and extract values (using wildcards, if necessary).
 // Copyright 2012-2013 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
