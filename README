@@ -1,4 +1,4 @@
-x2j.go - Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
+x2j.go - Unmarshal arbitrary XML docs to map[string]interface{} or JSON and extract values (using wildcards, if necessary).
 
 ANNOUNCEMENTS
 
