@@ -2,6 +2,10 @@ x2j.go - Unmarshal arbitrary XML docs to map[string]interface{} or JSON and extr
 
 ANNOUNCEMENTS
 
+23 January 2014:
+
+Extract path(s) for a tag/key value from an anonymous XML or map[string]interface{} value.  Result can be used with ValuesForKeyPath() / ValuesAtKeyPath().  Similar to ValuesFor...() functions but PathsFor...() and PathFor...Shortest() allow control expose the tree navigation information.
+
 20 December 2013:
 
 Non-UTF8 character sets supported via the X2jCharsetReader variable.
