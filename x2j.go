@@ -250,7 +250,9 @@ func xmlToTree(skey string, a []xml.Attr, p *xml.Decoder) (*Node, error) {
 			return n, nil
 		case xml.CharData:
 			tt := string(t.(xml.CharData))
-			if len(n.nodes) > 0 {
+			// 28-jan-14 ... clean up noise input
+			tt = strings.Trim(tt,"\t\r\b\n ")
+			if len(n.nodes) > 0 && len(tt) > 0 {
 				nn := new(Node)
 				nn.key = "#text"
 				nn.val = tt
