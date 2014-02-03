@@ -5,6 +5,8 @@
 /*
    Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
+	NOTICE: 03-Feb-2014, package deprecated.  Please see http://github.com/clbanning/mxj.
+
    One useful function is:
 
        - Unmarshal(doc []byte, v interface{}) error  
