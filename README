@@ -1,5 +1,12 @@
 x2j.go - Unmarshal arbitrary XML docs to map[string]interface{} or JSON and extract values (using wildcards, if necessary).
 
+NOTICE:
+
+AS OF 3-FEB-2014 THE x2j PACKAGE IS NO LONGER SUPPORTED.
+
+IT HAS BEEN DEPRECATED IN FAVOR OF mxj: http://github.com/clbanning/mxj.  
+(x2j can be implemented by uncommenting the functions in the x2j.go included with the mxj package.)
+
 ANNOUNCEMENTS
 
 23 January 2014:
