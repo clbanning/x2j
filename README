@@ -4,8 +4,7 @@ NOTICE:
 
 AS OF 3-FEB-2014 THE x2j PACKAGE IS NO LONGER SUPPORTED.
 
-IT HAS BEEN DEPRECATED IN FAVOR OF mxj: http://github.com/clbanning/mxj.  
-(x2j can be implemented by uncommenting the functions in the x2j.go included with the mxj package.)
+IT HAS BEEN DEPRECATED IN FAVOR OF mxj: http://github.com/clbanning/mxj/x2j.  
 
 ANNOUNCEMENTS
 

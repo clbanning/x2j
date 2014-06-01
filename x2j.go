@@ -5,7 +5,7 @@
 /*
    Unmarshal dynamic / arbitrary XML docs and extract values (using wildcards, if necessary).
 
-	NOTICE: 03-Feb-2014, package deprecated.  Please see http://github.com/clbanning/mxj.
+	NOTICE: 01-Jun-2014, package deprecated.  Please see http://github.com/clbanning/mxj/x2j.
 
    One useful function is:
 
