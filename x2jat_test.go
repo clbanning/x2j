@@ -81,6 +81,8 @@ var msg2 = `
 </msgs>`
 
 func TestValuesAtKeyPath(t *testing.T) {
+	fmt.Println("\n============================ x2jat_test.go")
+	fmt.Println("\n=============== TestValuesAtKeyPath ...")
 	fmt.Println("\nValuesAtKeyPath ... doc1#author")
 	m, _ := DocToMap(doc1)
 	ss := PathsForKey(m,"author")
@@ -131,6 +133,7 @@ func TestValuesAtKeyPath(t *testing.T) {
 }
 
 func TestValuesAtTagPath(t *testing.T) {
+	fmt.Println("\n=============== TestValuesAtTagPath ...")
 	fmt.Println("\nValuesAtTagPath ... doc1#author")
 	m, _ := DocToMap(doc1)
 	ss := PathsForKey(m,"author")

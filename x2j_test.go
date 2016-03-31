@@ -8,6 +8,8 @@ import (
 )
 
 func TestX2j(t *testing.T) {
+	fmt.Println("\n================================ x2j_test.go ...")
+	fmt.Println("\n=================== TestX2j ...")
 	fi, fierr := os.Stat("x2j_test.xml")
 	if fierr != nil {
 		fmt.Println("fierr:",fierr.Error())
@@ -63,6 +65,7 @@ func TestX2j(t *testing.T) {
 }
 
 func TestGetValue(t *testing.T) {
+	fmt.Println("\n=================== TestGetValue ...")
 	// test MapValue()
 	doc := `<entry><vars><foo>bar</foo><foo2><hello>world</hello></foo2></vars></entry>`
 	fmt.Println("\nRead doc:",doc)
@@ -105,6 +108,7 @@ func TestGetValue(t *testing.T) {
 
 
 func TestGetValueWithAttr(t *testing.T) {
+	fmt.Println("\n=================== TestGetValueWithAttr ...")
 	doc := `<entry><vars>
 		<foo item="1">bar</foo>
 		<foo item="2">
@@ -211,6 +215,7 @@ func TestGetValueWithAttr(t *testing.T) {
 }
 
 func TestStuff_1(t *testing.T) {
+	fmt.Println("\n=================== TestStuff_1 ...")
 	doc := `<doc>
 				<tag item="1">val2</tag>
 				<tag item="2">val2</tag>
@@ -253,9 +258,11 @@ func TestStuff_1(t *testing.T) {
 }
 
 func TestStuff_2(t *testing.T) {
-	doc := `<tag item="1">val2</tag>
-				<tag item="2">val2</tag>
-				<tag item="2" instance="2">val3</tag>`
+	fmt.Println("\n=================== TestStuff_2 ...")
+	doc := `
+<tag item="1">val2</tag>
+<tag item="2">val2</tag>
+<tag item="2" instance="2">val3</tag>`
 
 	fmt.Println(doc)
 	m,merr := DocToMap(doc)
@@ -309,6 +316,7 @@ func procErr(err error) bool {
 }
 
 func TestBulk(t *testing.T) {
+	fmt.Println("\n=================== TestBulkBuffer ...")
 	fmt.Println("\nBulk Message Processing Tests")
 	// if err := XmlMsgsFromFile("x2m_bulk.xml",procMap,procErr); err != nil {
 	if err := XmlMsgsFromFile("x2m_bulk.xml",procMapToJson,procErr); err != nil {
@@ -317,6 +325,7 @@ func TestBulk(t *testing.T) {
 }
 
 func TestBulkBuffer(t *testing.T) {
+	fmt.Println("\n=================== TestBulkBuffer ...")
 	fmt.Println("\nTest arbitrary XML buffer with no ending rootTag - then read from closed buffer.")
 	doc := `<doc><tag /></doc><doc><one att="1">my test doc</one></doc><doc><tag>missing end element</tag>`
 	b := NewXmlBuffer(doc)
@@ -337,6 +346,7 @@ func TestBulkBuffer(t *testing.T) {
 
 
 func TestTagAndKey(t *testing.T) {
+	fmt.Println("\n=================== TestTagAndKey ...")
 	var doc string
 	doc = `<doc>
 		<sections>

@@ -2,7 +2,9 @@
 
 package x2j
 
-import "strings"
+import (
+	"strings"
+)
 
 //----------------------------- find all paths to a key --------------------------------
 // Want eventually to extract shortest path and call GetValuesAtKeyPath()
@@ -62,7 +64,7 @@ func PathsForKey(m map[string]interface{}, key string) []string {
 	breadbasket := make(map[string]bool,0)
 	breadcrumb := ""
 
-	hasKeyPath(breadcrumb, m, key, breadbasket)
+	hasKeyPath(breadcrumb, m, key, &breadbasket)
 	if len(breadbasket) == 0 {
 		return nil
 	}
@@ -107,7 +109,7 @@ func PathForKeyShortest(m map[string]interface{}, key string) string {
 
 // hasKeyPath - if the map 'key' exists append it to KeyPath.path and increment KeyPath.depth
 // This is really just a breadcrumber that saves all trails that hit the prescribed 'key'.
-func hasKeyPath(crumb string, iv interface{}, key string, basket map[string]bool) {
+func hasKeyPath(crumb string, iv interface{}, key string, basket *map[string]bool) {
 	switch iv.(type) {
 	case map[string]interface{}:
 		vv := iv.(map[string]interface{})
@@ -118,7 +120,7 @@ func hasKeyPath(crumb string, iv interface{}, key string, basket map[string]bool
 				crumb += "." + key
 			}
 			// *basket = append(*basket, crumb)
-			basket[crumb] = true
+			(*basket)[crumb] = true
 		}
 		// walk on down the path, key could occur again at deeper node
 		for k, v := range vv {
