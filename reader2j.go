@@ -11,6 +11,13 @@ import (
 
 // ToTree() - parse a XML io.Reader to a tree of Nodes
 func ToTree(rdr io.Reader) (*Node, error) {
+	// We need to put an *os.File reader in a ByteReader or the xml.NewDecoder
+	// will wrap it in a bufio.Reader and seek on the file beyond where the
+	// xml.Decoder parses!
+	if _, ok := rdr.(io.ByteReader); !ok {
+		rdr = myByteReader(rdr) // see code at EOF
+	}
+
 	p := xml.NewDecoder(rdr)
 	p.CharsetReader = X2jCharsetReader
 	n, perr := xmlToTree("", nil, p)
@@ -102,4 +109,31 @@ func ReaderValuesForTag(rdr io.Reader, tag string) ([]interface{}, error) {
 	return ValuesForKey(m, tag), nil
 }
 
+
+//============================ from github.com/clbanning/mxj/mxl.go ==========================
+
+type byteReader struct {
+	r io.Reader
+	b []byte
+}
+
+func myByteReader(r io.Reader) io.Reader {
+	b := make([]byte, 1)
+	return &byteReader{r, b}
+}
+
+// need for io.Reader - but we don't use it ...
+func (b *byteReader) Read(p []byte) (int, error) {
+	return 0, nil
+}
+
+func (b *byteReader) ReadByte() (byte, error) {
+	n, err := b.r.Read(b.b)
+	if n == 1 {
+		return b.b[0], err
+	} else {
+		var c byte
+		return c, err
+	}
+}
 
