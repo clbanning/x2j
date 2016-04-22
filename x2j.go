@@ -1,5 +1,5 @@
 //	Unmarshal arbitrary XML docs to map[string]interface{} or JSON and extract values (using wildcards, if necessary).
-// Copyright 2012-2013 Charles Banning. All rights reserved.
+// Copyright 2012-2016 Charles Banning. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file
 /*
@@ -102,7 +102,7 @@ func DocToJson(doc string, recast ...bool) (string, error) {
 	if len(recast) == 1 {
 		r = recast[0]
 	}
-	m, merr := DocToMap(doc, r)
+	m, merr := xmlToMap([]byte(doc), r)
 	if m == nil || merr != nil {
 		return "", merr
 	}
@@ -124,7 +124,7 @@ func DocToJsonIndent(doc string, recast ...bool) (string, error) {
 	if len(recast) == 1 {
 		r = recast[0]
 	}
-	m, merr := DocToMap(doc, r)
+	m, merr := xmlToMap([]byte(doc), r)
 	if m == nil || merr != nil {
 		return "", merr
 	}
@@ -147,15 +147,7 @@ func DocToMap(doc string, recast ...bool) (map[string]interface{}, error) {
 	if len(recast) == 1 {
 		r = recast[0]
 	}
-	n, err := DocToTree(doc)
-	if err != nil {
-		return nil, err
-	}
-
-	m := make(map[string]interface{})
-	m[n.key] = n.treeToMap(r)
-
-	return m, nil
+	return xmlToMap([]byte(doc), r)
 }
 
 // DocToTree - convert an XML doc into a tree of nodes.
@@ -401,17 +393,14 @@ func WriteMap(m interface{}, offset ...int) string {
 //	'attrs' is an OPTIONAL list of "name:value" pairs for attributes.
 //	Note: 'recast' is not enabled here. Use DocToMap(), NewAttributeMap(), and MapValue() calls for that.
 func DocValue(doc, path string, attrs ...string) (interface{}, error) {
-	n, err := DocToTree(doc)
+	m, err := xmlToMap([]byte(doc), false)
 	if err != nil {
 		return nil, err
 	}
 
-	m := make(map[string]interface{})
-	m[n.key] = n.treeToMap(false)
-
-	a, aerr := NewAttributeMap(attrs...)
-	if aerr != nil {
-		return nil, aerr
+	a, err := NewAttributeMap(attrs...)
+	if err != nil {
+		return nil, err
 	}
 	v, verr := MapValue(m, path, a)
 	if verr != nil {
@@ -629,15 +618,7 @@ func ByteDocToMap(doc []byte, recast ...bool) (map[string]interface{}, error) {
 	if len(recast) == 1 {
 		r = recast[0]
 	}
-	n, err := ByteDocToTree(doc)
-	if err != nil {
-		return nil, err
-	}
-
-	m := make(map[string]interface{})
-	m[n.key] = n.treeToMap(r)
-
-	return m, nil
+	return xmlToMap(doc, r)
 }
 
 // ByteDocToTree - convert an XML doc into a tree of nodes.
