@@ -84,7 +84,6 @@ func ToJsonIndent(rdr io.Reader, recast ...bool) (string, error) {
 	return string(b), nil
 }
 
-
 // ReaderValuesFromTagPath - io.Reader version of ValuesFromTagPath()
 func ReaderValuesFromTagPath(rdr io.Reader, path string, getAttrs ...bool) ([]interface{}, error) {
 	var a bool
@@ -109,7 +108,6 @@ func ReaderValuesForTag(rdr io.Reader, tag string) ([]interface{}, error) {
 	return ValuesForKey(m, tag), nil
 }
 
-
 //============================ from github.com/clbanning/mxj/mxl.go ==========================
 
 type byteReader struct {
@@ -131,9 +129,7 @@ func (b *byteReader) ReadByte() (byte, error) {
 	_, err := b.r.Read(b.b)
 	if len(b.b) > 0 {
 		return b.b[0], nil
-	} else {
-		var c byte
-		return c, err
 	}
+	var c byte
+	return c, err
 }
-
