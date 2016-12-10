@@ -65,7 +65,9 @@
     NON-UTF8 CHARACTER SETS
 
     Use the X2jCharsetReader variable to assign io.Reader for alternative character sets.
+
 */
+// Deprecated: Use github.com/clbanning/mxj
 package x2j
 
 import (
