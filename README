@@ -10,7 +10,7 @@ ANNOUNCEMENTS
 
 22 April 2016:
 
-People keep cloning this "DEPRECATED" repo at the rate of 30-40 per day, so I've pulled in the github.com/clbanning/mxj decoder that is orders of magnitude faster to speed things up. (It'd be great if everyone would just use the mxj package.)
+People keep cloning this "DEPRECATED" repo at the rate of about 100 per day, so I've pulled in the github.com/clbanning/mxj decoder that is orders of magnitude faster to speed things up. (It'd be great if everyone would just use the mxj package.)
 
 23 January 2014:
 
