@@ -5,6 +5,7 @@ NOTICE:
 AS OF 3-FEB-2014 THE x2j PACKAGE IS NO LONGER SUPPORTED.
 
 IT HAS BEEN DEPRECATED IN FAVOR OF mxj/x2j: https://github.com/clbanning/mxj/tree/master/x2j.
+**** Use the github.com/clbannig/mxj/x2j-wrapper sub-package to port your old x2j code. ****
 
 ANNOUNCEMENTS
 
